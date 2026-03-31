@@ -12,335 +12,368 @@
 <title>ContentFlow</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-:root {
-  --bg: #eae8e3; --white: #ffffff; --dark: #111110; --dark2: #1c1c1a;
-  --orange: #f04e23; --purple-bg: #d4d0f7; --purple-dark: #3d3580;
-  --text: #111110; --text2: #6b6860; --text3: #a8a5a0;
-  --border: rgba(0,0,0,0.08); --border2: rgba(0,0,0,0.14);
-  --r: 24px; --r-sm: 14px; --r-xs: 8px;
-  --font-display: 'Syne', sans-serif; --font: 'DM Sans', sans-serif; --mono: 'DM Mono', monospace;
-  --sidebar-w: 230px; --safe-top: env(safe-area-inset-top); --safe-bot: env(safe-area-inset-bottom);
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#eae8e3;--surface:#fff;--surface2:#f4f2ed;
+  --dark:#111110;--orange:#f04e23;--purple-bg:#d4d0f7;--purple-dark:#3d3580;
+  --text:#111110;--text2:#6b6860;--text3:#a8a5a0;
+  --border:rgba(0,0,0,.08);--border2:rgba(0,0,0,.14);
+  --r:24px;--r-sm:14px;--r-xs:8px;
+  --font-display:'Syne',sans-serif;--font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+  --sidebar-w:230px;--safe-top:env(safe-area-inset-top);--safe-bot:env(safe-area-inset-bottom);
 }
-html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-family: var(--font); font-size: 14px; }
-::-webkit-scrollbar { width: 3px; height: 3px; }
-::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 3px; }
-
-.app { display: flex; height: 100vh; height: 100dvh; }
-.sidebar { width: var(--sidebar-w); min-width: var(--sidebar-w); background: var(--white); display: flex; flex-direction: column; border-right: 1px solid var(--border); transition: transform 0.25s cubic-bezier(.4,0,.2,1); }
-.main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
-
-.sb-head { padding: calc(20px + var(--safe-top)) 20px 16px; }
-.logo { display: flex; align-items: center; gap: 10px; }
-.logo-mark { width: 32px; height: 32px; background: var(--dark); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
-.logo-mark svg { width: 18px; height: 18px; }
-.logo-name { font-family: var(--font-display); font-size: 16px; font-weight: 700; }
-
-.sb-body { flex: 1; overflow-y: auto; padding: 8px 12px; }
-.nav-label { font-size: 10px; color: var(--text3); font-family: var(--mono); letter-spacing: 0.1em; padding: 12px 8px 6px; text-transform: uppercase; }
-.nav-btn { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: var(--r-xs); cursor: pointer; font-size: 13px; color: var(--text2); transition: all 0.14s; border: none; background: none; width: 100%; text-align: left; font-family: var(--font); }
-.nav-btn:hover { background: var(--bg); color: var(--text); }
-.nav-btn.active { background: var(--dark); color: #fff; font-weight: 500; }
-.nav-btn svg { width: 16px; height: 16px; flex-shrink: 0; opacity: 0.7; }
-.nav-btn.active svg { opacity: 1; }
-.nav-badge { margin-left: auto; font-size: 10px; font-family: var(--mono); padding: 2px 7px; border-radius: 20px; background: var(--bg); color: var(--text2); }
-.nav-btn.active .nav-badge { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.7); }
-
-.sb-foot { padding: 12px 12px calc(12px + var(--safe-bot)); border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; }
-
-/* ── SYNC STATUS ── */
-.sync-bar { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: var(--r-xs); background: var(--bg); }
-.sync-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; transition: background 0.3s; }
-.sync-dot.online  { background: #2a9d5c; }
-.sync-dot.syncing { background: var(--orange); animation: blink 0.8s infinite; }
-.sync-dot.offline { background: #e53; }
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
-.sync-label { font-size: 11px; font-family: var(--mono); color: var(--text3); flex: 1; }
-.sync-pending { font-size: 10px; font-family: var(--mono); color: var(--orange); display: none; }
-.sync-pending.show { display: block; }
-
-.client-chip { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--bg); border-radius: var(--r-sm); cursor: pointer; border: 1px solid var(--border); }
-.client-chip:hover { border-color: var(--border2); }
-.c-av { width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; font-family: var(--font-display); flex-shrink: 0; }
-.c-name { font-size: 13px; font-weight: 500; color: var(--text); flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.c-role { font-size: 10px; color: var(--text3); }
-
-.topbar { padding: 0 24px; height: 56px; display: flex; align-items: center; gap: 14px; background: var(--bg); flex-shrink: 0; }
-.hamburger { display: none; background: var(--white); border: 1px solid var(--border); color: var(--text2); cursor: pointer; padding: 7px; border-radius: var(--r-xs); }
-.topbar-title { font-family: var(--font-display); font-size: 18px; font-weight: 700; letter-spacing: -0.3px; }
-.topbar-sep { flex: 1; }
-.btn { padding: 9px 18px; border-radius: 50px; font-size: 13px; font-weight: 500; cursor: pointer; border: 1.5px solid var(--border); background: var(--white); color: var(--text2); transition: all 0.14s; font-family: var(--font); white-space: nowrap; }
-.btn:hover { border-color: var(--border2); color: var(--text); }
-.btn-dark { background: var(--dark); color: #fff; border-color: var(--dark); font-weight: 600; }
-.btn-dark:hover { background: var(--dark2); }
-.btn-orange { background: var(--orange); color: #fff; border-color: var(--orange); }
-
-.content { flex: 1; overflow-y: auto; padding: 0 20px 20px; }
-.view { display: none; animation: fadeUp 0.18s ease; }
-.view.active { display: block; }
-@keyframes fadeUp { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }
-
-/* ── DASHBOARD ── */
-.dash-bento { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; }
-.dash-metric { border-radius: var(--r); padding: 20px; }
-.dm-white { background: var(--white); }
-.dm-dark  { background: var(--dark); }
-.dm-orange{ background: var(--orange); }
-.dm-purple{ background: var(--purple-bg); }
-.dm-label { font-size: 10px; font-family: var(--mono); letter-spacing: 0.08em; margin-bottom: 10px; }
-.dm-white .dm-label  { color: var(--text3); }
-.dm-dark .dm-label   { color: rgba(255,255,255,0.4); }
-.dm-orange .dm-label { color: rgba(255,255,255,0.55); }
-.dm-purple .dm-label { color: rgba(61,53,128,0.45); }
-.dm-value { font-family: var(--font-display); font-size: 40px; font-weight: 800; line-height: 1; letter-spacing: -2px; }
-.dm-white .dm-value  { color: var(--text); }
-.dm-dark .dm-value   { color: #fff; }
-.dm-orange .dm-value { color: #fff; }
-.dm-purple .dm-value { color: var(--purple-dark); }
-.dm-sub { font-size: 12px; margin-top: 7px; }
-.dm-white .dm-sub  { color: var(--text3); }
-.dm-dark .dm-sub   { color: rgba(255,255,255,0.35); }
-.dm-orange .dm-sub { color: rgba(255,255,255,0.65); }
-.dm-purple .dm-sub { color: rgba(61,53,128,0.5); }
-.dm-prog-track { height: 3px; border-radius: 2px; margin-top: 10px; overflow: hidden; }
-.dm-dark .dm-prog-track { background: rgba(255,255,255,0.1); }
-.dm-fill { height: 100%; border-radius: 2px; transition: width 0.6s ease; }
-
-.dash-status { grid-column: span 3; background: var(--dark); border-radius: var(--r); padding: 22px 26px; }
-.dash-plats  { background: var(--white); border-radius: var(--r); padding: 20px; }
-.ds-title { font-size: 10px; font-family: var(--mono); color: rgba(255,255,255,0.3); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 18px; }
-.status-bars { display: flex; align-items: flex-end; gap: 7px; height: 88px; }
-.sb-col { flex: 1; display: flex; flex-direction: column; align-items: center; }
-.sb-bar { width: 100%; border-radius: 5px 5px 0 0; transition: height 0.6s cubic-bezier(.4,0,.2,1); }
-.sb-n   { font-size: 10px; color: rgba(255,255,255,0.4); font-family: var(--mono); margin-bottom: 4px; }
-.sb-lbl { font-size: 9px; color: rgba(255,255,255,0.22); margin-top: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
-.plat-title { font-size: 10px; color: var(--text3); font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px; }
-.plat-row { display: flex; align-items: center; gap: 9px; margin-bottom: 8px; }
-.plat-dot { width: 8px; height: 8px; border-radius: 3px; flex-shrink: 0; }
-.plat-name { font-size: 12px; color: var(--text2); flex: 1; }
-.plat-n { font-size: 12px; font-family: var(--mono); font-weight: 500; }
-.plat-track { flex: 2; height: 3px; background: var(--bg); border-radius: 2px; overflow: hidden; }
-.plat-fill { height: 100%; border-radius: 2px; }
-
-.dash-recent { grid-column: span 2; background: var(--white); border-radius: var(--r); padding: 20px 22px; }
-.dash-exec   { grid-column: span 2; background: var(--orange); border-radius: var(--r); padding: 22px 26px; }
-.dr-title { font-family: var(--font-display); font-size: 15px; font-weight: 700; margin-bottom: 12px; }
-.recent-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; background: var(--bg); border-radius: var(--r-sm); margin-bottom: 7px; }
-.ri-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-.ri-title { font-size: 12px; font-weight: 500; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.ri-badge { font-size: 10px; font-family: var(--mono); padding: 3px 8px; border-radius: 20px; background: var(--white); color: var(--text2); flex-shrink: 0; }
-.de-label { font-size: 10px; color: rgba(255,255,255,0.5); font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
-.de-big { font-family: var(--font-display); font-size: 48px; font-weight: 800; color: #fff; letter-spacing: -3px; line-height: 1; margin-bottom: 4px; }
-.de-sub { font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 14px; }
-.de-prog-track { height: 5px; background: rgba(255,255,255,0.2); border-radius: 3px; overflow: hidden; }
-.de-prog-fill { height: 100%; background: #fff; border-radius: 3px; transition: width 0.6s ease; }
-.de-stats { display: flex; gap: 18px; margin-top: 12px; }
-.de-sv { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: #fff; line-height: 1; }
-.de-sl { font-size: 10px; color: rgba(255,255,255,0.5); margin-top: 2px; }
-
-/* ── CALENDAR ── */
-.cal-shell { background: var(--white); border-radius: var(--r); overflow: hidden; }
-.cal-top { display: flex; align-items: center; gap: 12px; padding: 18px 22px 0; }
-.cal-month-lbl { font-family: var(--font-display); font-size: 19px; font-weight: 800; letter-spacing: -0.5px; }
-.cal-nav { width: 30px; height: 30px; border: 1.5px solid var(--border); border-radius: 50%; background: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; color: var(--text2); }
-.cal-nav:hover { background: var(--bg); }
-.cal-sep { flex: 1; }
-.cal-toggle { display: flex; gap: 3px; background: var(--bg); padding: 3px; border-radius: 9px; }
-.ct-btn { padding: 5px 13px; border-radius: 7px; font-size: 12px; font-weight: 500; cursor: pointer; border: none; background: none; color: var(--text3); font-family: var(--font); }
-.ct-btn.active { background: var(--white); color: var(--text); }
-.cal-grid-wrap { padding: 14px 18px 18px; }
-.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
-.cal-hdr { padding: 7px 5px; font-size: 10px; color: var(--text3); font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.06em; }
-.cal-day { min-height: 84px; padding: 7px 5px; cursor: pointer; border-radius: var(--r-xs); transition: background 0.1s; }
-.cal-day:hover { background: var(--bg); }
-.cal-day.other { opacity: 0.3; }
-.cal-day.today .dn { background: var(--dark); color: #fff; border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; margin-left: -1px; }
-.dn { font-size: 12px; color: var(--text3); font-family: var(--mono); margin-bottom: 4px; }
-.cal-chip { padding: 2px 6px; border-radius: 5px; font-size: 10px; font-weight: 600; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
-
-/* ── KANBAN ── */
-.kanban-wrap { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; }
-.k-col { min-width: 215px; width: 215px; display: flex; flex-direction: column; flex-shrink: 0; max-height: calc(100dvh - 100px); }
-.k-col-head { padding: 12px 4px 8px; display: flex; align-items: center; justify-content: space-between; }
-.k-col-name { font-family: var(--font-display); font-size: 13px; font-weight: 700; }
-.k-col-badge { background: var(--white); border-radius: 20px; padding: 2px 7px; font-size: 11px; font-family: var(--mono); color: var(--text2); }
-.k-col-body { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 7px; padding: 2px; }
-.k-card { background: var(--white); border-radius: var(--r-sm); padding: 13px; cursor: grab; border: 1.5px solid transparent; transition: all 0.14s; }
-.k-card:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(0,0,0,0.08); }
-.k-card.dragging { opacity: 0.3; }
-.k-card.drag-over { border-color: var(--orange); }
-.k-col.drag-over-col { opacity: 0.8; }
-.kc-plat { font-size: 10px; font-family: var(--mono); color: var(--text3); margin-bottom: 6px; text-transform: uppercase; }
-.kc-title { font-size: 13px; font-weight: 600; font-family: var(--font-display); color: var(--text); line-height: 1.35; margin-bottom: 9px; }
-.kc-date { font-size: 10px; color: var(--text3); font-family: var(--mono); margin-top: 8px; }
-.k-add-btn { width: 100%; padding: 9px; border: 1.5px dashed rgba(0,0,0,0.12); background: none; border-radius: var(--r-sm); color: var(--text3); font-size: 12px; cursor: pointer; font-family: var(--font); margin-top: 4px; transition: all 0.14s; }
-.k-add-btn:hover { border-color: var(--border2); color: var(--text2); background: var(--white); }
-.k-empty { padding: 18px 10px; text-align: center; font-size: 12px; color: var(--text3); }
-
-/* ── IDEAS ── */
-.ideas-top { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
-.ideas-search { flex: 1; padding: 10px 16px; background: var(--white); border: 1.5px solid var(--border); border-radius: 50px; color: var(--text); font-size: 13px; font-family: var(--font); }
-.ideas-search:focus { outline: none; border-color: var(--border2); }
-.ideas-search::placeholder { color: var(--text3); }
-.ideas-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; }
-.idea-card { border-radius: var(--r); padding: 18px; }
-.ic-white  { background: var(--white); }
-.ic-dark   { background: var(--dark); }
-.ic-purple { background: var(--purple-bg); }
-.idea-hook { font-family: var(--font-display); font-size: 14px; font-weight: 700; line-height: 1.4; margin-bottom: 10px; }
-.ic-white .idea-hook  { color: var(--text); }
-.ic-dark .idea-hook   { color: #fff; }
-.ic-purple .idea-hook { color: var(--purple-dark); }
-.idea-meta { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
-.ima-row { display: flex; gap: 8px; }
-.ima-lbl { font-size: 10px; font-family: var(--mono); min-width: 65px; padding-top: 1px; text-transform: uppercase; letter-spacing: 0.05em; }
-.ic-white .ima-lbl  { color: var(--text3); }
-.ic-dark .ima-lbl   { color: rgba(255,255,255,0.3); }
-.ic-purple .ima-lbl { color: rgba(61,53,128,0.4); }
-.ima-val { font-size: 12px; line-height: 1.4; }
-.ic-white .ima-val  { color: var(--text2); }
-.ic-dark .ima-val   { color: rgba(255,255,255,0.6); }
-.ic-purple .ima-val { color: rgba(61,53,128,0.7); }
-.idea-actions { display: flex; gap: 8px; }
-.idea-pri { padding: 7px 14px; border-radius: 50px; font-size: 12px; font-weight: 600; cursor: pointer; border: none; font-family: var(--font); }
-.ic-white .idea-pri  { background: var(--dark); color: #fff; }
-.ic-dark .idea-pri   { background: var(--orange); color: #fff; }
-.ic-purple .idea-pri { background: var(--purple-dark); color: #fff; }
-.idea-sec { padding: 7px 14px; border-radius: 50px; font-size: 12px; cursor: pointer; background: none; font-family: var(--font); }
-.ic-white .idea-sec  { border: 1.5px solid rgba(0,0,0,0.1); color: var(--text3); }
-.ic-dark .idea-sec   { border: 1.5px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.45); }
-.ic-purple .idea-sec { border: 1.5px solid rgba(61,53,128,0.2); color: rgba(61,53,128,0.55); }
-
-/* ── TAGS ── */
-.tags-bento { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.tag-panel { border-radius: var(--r); padding: 22px; }
-.tag-panel:nth-child(1) { background: var(--dark); }
-.tag-panel:nth-child(2) { background: var(--white); }
-.tag-panel:nth-child(3) { background: var(--orange); }
-.tag-panel:nth-child(4) { background: var(--purple-bg); }
-.tp-lbl { font-size: 10px; font-family: var(--mono); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 6px; }
-.tag-panel:nth-child(1) .tp-lbl { color: rgba(255,255,255,0.3); }
-.tag-panel:nth-child(2) .tp-lbl { color: var(--text3); }
-.tag-panel:nth-child(3) .tp-lbl { color: rgba(255,255,255,0.45); }
-.tag-panel:nth-child(4) .tp-lbl { color: rgba(61,53,128,0.4); }
-.tp-title { font-family: var(--font-display); font-size: 17px; font-weight: 800; margin-bottom: 14px; }
-.tag-panel:nth-child(1) .tp-title { color: #fff; }
-.tag-panel:nth-child(2) .tp-title { color: var(--text); }
-.tag-panel:nth-child(3) .tp-title { color: #fff; }
-.tag-panel:nth-child(4) .tp-title { color: var(--purple-dark); }
-.tags-flex { display: flex; flex-wrap: wrap; gap: 6px; }
-.tag-pill { padding: 6px 13px; border-radius: 50px; font-size: 12px; font-weight: 500; cursor: pointer; border: 1.5px solid transparent; transition: all 0.12s; }
-.tag-panel:nth-child(1) .tag-pill { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.7); }
-.tag-panel:nth-child(2) .tag-pill { background: var(--bg); color: var(--text2); }
-.tag-panel:nth-child(3) .tag-pill { background: rgba(255,255,255,0.15); color: #fff; }
-.tag-panel:nth-child(4) .tag-pill { background: rgba(61,53,128,0.12); color: var(--purple-dark); }
-.tag-add { padding: 6px 13px; border-radius: 50px; font-size: 12px; cursor: pointer; font-family: var(--font); background: none; }
-.tag-panel:nth-child(1) .tag-add { border: 1.5px dashed rgba(255,255,255,0.2); color: rgba(255,255,255,0.4); }
-.tag-panel:nth-child(2) .tag-add { border: 1.5px dashed rgba(0,0,0,0.15); color: var(--text3); }
-.tag-panel:nth-child(3) .tag-add { border: 1.5px dashed rgba(255,255,255,0.3); color: rgba(255,255,255,0.6); }
-.tag-panel:nth-child(4) .tag-add { border: 1.5px dashed rgba(61,53,128,0.25); color: rgba(61,53,128,0.5); }
-
-/* ── CLIENTS ── */
-.clients-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin-bottom: 14px; }
-.client-card { border-radius: var(--r); padding: 20px; cursor: pointer; border: 2px solid transparent; transition: all 0.14s; }
-.client-card:nth-child(3n+1) { background: var(--white); }
-.client-card:nth-child(3n+2) { background: var(--dark); }
-.client-card:nth-child(3n)   { background: var(--purple-bg); }
-.client-card.active-c { border-color: var(--orange) !important; }
-.cc-av { width: 42px; height: 42px; border-radius: var(--r-sm); display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 14px; font-weight: 800; margin-bottom: 12px; }
-.cc-name { font-family: var(--font-display); font-size: 15px; font-weight: 700; margin-bottom: 3px; }
-.client-card:nth-child(3n+1) .cc-name { color: var(--text); }
-.client-card:nth-child(3n+2) .cc-name { color: #fff; }
-.client-card:nth-child(3n)   .cc-name { color: var(--purple-dark); }
-.cc-niche { font-size: 12px; margin-bottom: 12px; }
-.client-card:nth-child(3n+1) .cc-niche { color: var(--text3); }
-.client-card:nth-child(3n+2) .cc-niche { color: rgba(255,255,255,0.4); }
-.client-card:nth-child(3n)   .cc-niche { color: rgba(61,53,128,0.5); }
-.cc-stats { display: flex; gap: 14px; }
-.cc-sv { font-family: var(--font-display); font-size: 19px; font-weight: 800; }
-.client-card:nth-child(3n+1) .cc-sv { color: var(--text); }
-.client-card:nth-child(3n+2) .cc-sv { color: #fff; }
-.client-card:nth-child(3n)   .cc-sv { color: var(--purple-dark); }
-.cc-sl { font-size: 10px; font-family: var(--mono); }
-.client-card:nth-child(3n+1) .cc-sl { color: var(--text3); }
-.client-card:nth-child(3n+2) .cc-sl { color: rgba(255,255,255,0.3); }
-.client-card:nth-child(3n)   .cc-sl { color: rgba(61,53,128,0.4); }
-.cc-active { font-size: 10px; font-family: var(--mono); color: var(--orange); margin-top: 10px; }
-
-/* ── CHIP ── */
-.chip { padding: 3px 8px; border-radius: 20px; font-size: 10px; font-weight: 600; }
-.chip-dark   { background: rgba(0,0,0,0.07); color: var(--text2); }
-.chip-orange { background: rgba(240,78,35,0.1); color: var(--orange); }
-.chip-green  { background: rgba(42,157,92,0.12); color: #1f7d47; }
-.chip-blue   { background: rgba(37,99,235,0.1); color: #1d4ed8; }
-.chip-purple { background: rgba(61,53,128,0.1); color: var(--purple-dark); }
-
-/* ── MODAL ── */
-.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 200; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); }
-.modal-overlay.open { display: flex; }
-.modal { background: var(--white); border-radius: var(--r); width: 100%; max-width: 510px; max-height: 88dvh; overflow-y: auto; animation: mIn 0.2s cubic-bezier(.4,0,.2,1); }
-@keyframes mIn { from{opacity:0;transform:scale(0.95) translateY(10px)} to{opacity:1;transform:scale(1) translateY(0)} }
-.modal-head { padding: 20px 22px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--white); z-index: 1; border-radius: var(--r) var(--r) 0 0; }
-.modal-title { font-family: var(--font-display); font-size: 18px; font-weight: 800; }
-.modal-close { width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid var(--border); background: none; cursor: pointer; color: var(--text3); font-size: 18px; display: flex; align-items: center; justify-content: center; }
-.modal-close:hover { background: var(--bg); }
-.modal-body { padding: 20px 22px; display: flex; flex-direction: column; gap: 14px; }
-.modal-foot { padding: 14px 22px 20px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 10px; }
-.form-group { display: flex; flex-direction: column; gap: 5px; }
-.form-label { font-size: 11px; color: var(--text3); font-family: var(--mono); letter-spacing: 0.06em; text-transform: uppercase; }
-.form-input, .form-select, .form-textarea { background: var(--bg); border: 1.5px solid transparent; border-radius: var(--r-sm); padding: 10px 13px; font-size: 14px; color: var(--text); font-family: var(--font); width: 100%; outline: none; transition: border-color 0.14s; }
-.form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--dark); background: var(--white); }
-.form-input::placeholder { color: var(--text3); }
-.form-textarea { min-height: 88px; resize: vertical; line-height: 1.6; }
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-
-/* ── LOADING ── */
-.loading-screen { position: fixed; inset: 0; background: var(--white); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; z-index: 999; transition: opacity 0.4s; }
-.loading-screen.gone { opacity: 0; pointer-events: none; }
-.loading-logo { font-family: var(--font-display); font-size: 26px; font-weight: 800; }
-.loading-bar { width: 110px; height: 3px; background: var(--bg); border-radius: 2px; overflow: hidden; }
-.loading-anim { height: 100%; background: var(--orange); border-radius: 2px; animation: lAnim 1.1s ease infinite; }
-@keyframes lAnim { 0%{width:0;margin-left:0} 50%{width:80%;margin-left:0} 100%{width:0;margin-left:110px} }
-.loading-msg { font-size: 12px; color: var(--text3); font-family: var(--mono); }
-
-/* ── TOAST ── */
-.toast { position: fixed; bottom: calc(28px + var(--safe-bot)); left: 50%; transform: translateX(-50%) translateY(70px); background: var(--dark); color: #fff; padding: 10px 20px; border-radius: 50px; font-size: 13px; font-weight: 500; z-index: 300; transition: transform 0.25s cubic-bezier(.4,0,.2,1); pointer-events: none; white-space: nowrap; }
-.toast.show { transform: translateX(-50%) translateY(0); }
-
-/* ── OFFLINE BANNER ── */
-.offline-banner { display: none; background: #e53; color: #fff; text-align: center; font-size: 12px; font-family: var(--mono); padding: 6px; }
-.offline-banner.show { display: block; }
-
-/* ── MOBILE ── */
-@media (max-width: 768px) {
-  .sidebar { position: fixed; left: 0; top: 0; bottom: 0; z-index: 100; transform: translateX(-100%); }
-  .sidebar.open { transform: translateX(0); box-shadow: 8px 0 30px rgba(0,0,0,0.15); }
-  .sb-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 99; }
-  .sb-overlay.open { display: block; }
-  .hamburger { display: flex !important; }
-  .dash-bento { grid-template-columns: 1fr 1fr; }
-  .dash-status, .dash-plats, .dash-recent, .dash-exec { grid-column: span 2; }
-  .tags-bento { grid-template-columns: 1fr; }
-  .content { padding: 0 12px 16px; }
-  .topbar { padding: 0 14px; }
-  .btn:not(.btn-dark):not(.btn-orange) { display: none; }
+body.dark{
+  --bg:#0f0f0e;--surface:#1a1a18;--surface2:#222220;
+  --dark:#f0ede8;--text:#f0ede8;--text2:#8a8784;--text3:#5a5855;
+  --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.12);
+  --purple-bg:#1e1a3a;--purple-dark:#a89cf7;
+}
+body.dark .nav-btn.active{background:#f0ede8;color:#111}
+body.dark .logo-mark{background:#f0ede8}
+body.dark .logo-mark svg path{fill:#111}
+body.dark .dash-metric.dm-dark{background:#f0ede8}
+body.dark .dash-metric.dm-dark .dm-label{color:rgba(0,0,0,.4)}
+body.dark .dash-metric.dm-dark .dm-value{color:#111}
+body.dark .dash-metric.dm-dark .dm-prog-track{background:rgba(0,0,0,.1)}
+body.dark .dash-status{background:#f0ede8}
+body.dark .ds-title{color:rgba(0,0,0,.3)!important}
+body.dark .k-card{background:var(--surface2)}
+body.dark .recent-item{background:var(--surface2)}
+body.dark .ri-badge{background:var(--surface)}
+body.dark .ic-white{background:var(--surface)}
+body.dark .idea-card.ic-white .idea-hook{color:var(--text)}
+body.dark .idea-card.ic-white .ima-lbl{color:var(--text3)}
+body.dark .idea-card.ic-white .ima-val{color:var(--text2)}
+body.dark .idea-card.ic-white .idea-pri{background:#f0ede8;color:#111}
+body.dark .idea-card.ic-white .idea-sec{border-color:rgba(255,255,255,.12);color:var(--text3)}
+body.dark .client-card:nth-child(3n+1){background:var(--surface)}
+body.dark .tag-panel:nth-child(2){background:var(--surface)}
+body.dark .tag-panel:nth-child(2) .tp-title{color:var(--text)}
+body.dark .tag-panel:nth-child(2) .tag-pill{background:var(--surface2);color:var(--text2)}
+body.dark .cal-shell{background:var(--surface)}
+body.dark .cal-toggle{background:var(--surface2)}
+body.dark .ct-btn.active{background:var(--surface)}
+body.dark .cal-day:hover{background:var(--surface2)}
+body.dark .ideas-search{background:var(--surface);color:var(--text)}
+body.dark .modal{background:var(--surface)}
+body.dark .modal-head{background:var(--surface)}
+body.dark .form-input,body.dark .form-select,body.dark .form-textarea{background:var(--surface2);color:var(--text)}
+body.dark .client-chip{background:var(--surface2)}
+body.dark .sync-bar{background:var(--surface2)}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;transition:background .25s,color .25s}
+::-webkit-scrollbar{width:3px;height:3px}
+::-webkit-scrollbar-thumb{background:rgba(128,128,128,.25);border-radius:3px}
+.app{display:flex;height:100vh;height:100dvh}
+.sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);background:var(--surface);display:flex;flex-direction:column;border-right:1px solid var(--border);transition:transform .25s cubic-bezier(.4,0,.2,1),background .25s}
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.sb-head{padding:calc(20px + var(--safe-top)) 20px 16px;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-mark{width:32px;height:32px;background:var(--dark);border-radius:10px;display:flex;align-items:center;justify-content:center;transition:background .25s;flex-shrink:0}
+.logo-mark svg{width:18px;height:18px}
+.logo-name{font-family:var(--font-display);font-size:16px;font-weight:700}
+/* dark toggle */
+.dark-toggle{width:38px;height:22px;border-radius:11px;background:var(--border2);border:none;cursor:pointer;position:relative;transition:background .25s;flex-shrink:0}
+.dark-toggle::after{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;top:3px;left:3px;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+body.dark .dark-toggle{background:var(--orange)}
+body.dark .dark-toggle::after{transform:translateX(16px)}
+.sb-body{flex:1;overflow-y:auto;padding:8px 12px}
+.nav-label{font-size:10px;color:var(--text3);font-family:var(--mono);letter-spacing:.1em;padding:12px 8px 6px;text-transform:uppercase}
+.nav-btn{display:flex;align-items:center;gap:10px;padding:10px;border-radius:var(--r-xs);cursor:pointer;font-size:13px;color:var(--text2);transition:all .14s;border:none;background:none;width:100%;text-align:left;font-family:var(--font)}
+.nav-btn:hover{background:var(--bg);color:var(--text)}
+.nav-btn.active{background:var(--dark);color:var(--surface);font-weight:500}
+.nav-btn svg{width:16px;height:16px;flex-shrink:0;opacity:.7}
+.nav-btn.active svg{opacity:1}
+.nav-badge{margin-left:auto;font-size:10px;font-family:var(--mono);padding:2px 7px;border-radius:20px;background:var(--bg);color:var(--text2)}
+.nav-btn.active .nav-badge{background:rgba(128,128,128,.2);color:rgba(200,200,200,.7)}
+.sb-foot{padding:12px 12px calc(12px + var(--safe-bot));border-top:1px solid var(--border);display:flex;flex-direction:column;gap:8px}
+.sync-bar{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--r-xs);background:var(--bg)}
+.sync-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;transition:background .3s}
+.sync-dot.online{background:#2a9d5c}
+.sync-dot.syncing{background:var(--orange);animation:blink .8s infinite}
+.sync-dot.offline{background:#e53}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.sync-label{font-size:11px;font-family:var(--mono);color:var(--text3);flex:1}
+.sync-pending{font-size:10px;font-family:var(--mono);color:var(--orange);display:none}
+.sync-pending.show{display:block}
+.client-chip{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg);border-radius:var(--r-sm);cursor:pointer;border:1px solid var(--border)}
+.client-chip:hover{border-color:var(--border2)}
+.c-av{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;font-family:var(--font-display);flex-shrink:0}
+.c-name{font-size:13px;font-weight:500;color:var(--text);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.c-role{font-size:10px;color:var(--text3)}
+.topbar{padding:0 24px;height:56px;display:flex;align-items:center;gap:14px;background:var(--bg);flex-shrink:0}
+.hamburger{display:none;background:var(--surface);border:1px solid var(--border);color:var(--text2);cursor:pointer;padding:7px;border-radius:var(--r-xs)}
+.topbar-title{font-family:var(--font-display);font-size:18px;font-weight:700;letter-spacing:-.3px}
+.topbar-sep{flex:1}
+.btn{padding:9px 18px;border-radius:50px;font-size:13px;font-weight:500;cursor:pointer;border:1.5px solid var(--border2);background:var(--surface);color:var(--text2);transition:all .14s;font-family:var(--font);white-space:nowrap}
+.btn:hover{color:var(--text)}
+.btn-dark{background:var(--dark);color:var(--surface);border-color:var(--dark);font-weight:600}
+.btn-dark:hover{opacity:.85}
+.btn-danger{background:none;color:#e53;border-color:rgba(238,85,51,.25);font-size:12px;padding:7px 14px}
+.btn-danger:hover{background:rgba(238,85,51,.06)}
+.content{flex:1;overflow-y:auto;padding:0 20px 20px}
+.view{display:none;animation:fadeUp .18s ease}
+.view.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+/* DASHBOARD */
+.dash-bento{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px}
+.dash-metric{border-radius:var(--r);padding:20px;transition:background .25s}
+.dm-white{background:var(--surface)}
+.dm-dark{background:var(--dark)}
+.dm-orange{background:var(--orange)}
+.dm-purple{background:var(--purple-bg)}
+.dm-label{font-size:10px;font-family:var(--mono);letter-spacing:.08em;margin-bottom:10px}
+.dm-white .dm-label{color:var(--text3)}
+.dm-dark .dm-label{color:rgba(255,255,255,.4)}
+.dm-orange .dm-label{color:rgba(255,255,255,.55)}
+.dm-purple .dm-label{color:rgba(61,53,128,.45)}
+body.dark .dm-purple .dm-label{color:rgba(168,156,247,.5)}
+.dm-value{font-family:var(--font-display);font-size:40px;font-weight:800;line-height:1;letter-spacing:-2px}
+.dm-white .dm-value{color:var(--text)}
+.dm-dark .dm-value{color:#fff}
+.dm-orange .dm-value{color:#fff}
+.dm-purple .dm-value{color:var(--purple-dark)}
+.dm-sub{font-size:12px;margin-top:7px}
+.dm-white .dm-sub{color:var(--text3)}
+.dm-dark .dm-sub{color:rgba(255,255,255,.35)}
+.dm-orange .dm-sub{color:rgba(255,255,255,.65)}
+.dm-purple .dm-sub{color:rgba(61,53,128,.5)}
+.dm-prog-track{height:3px;border-radius:2px;margin-top:10px;overflow:hidden}
+.dm-dark .dm-prog-track{background:rgba(255,255,255,.1)}
+.dm-white .dm-prog-track{background:var(--bg)}
+.dm-fill{height:100%;border-radius:2px;transition:width .6s ease}
+/* LINE CHART */
+.dash-status{grid-column:span 3;background:var(--dark);border-radius:var(--r);padding:22px 26px;transition:background .25s}
+.dash-plats{background:var(--surface);border-radius:var(--r);padding:20px;transition:background .25s}
+.ds-title{font-size:10px;font-family:var(--mono);color:rgba(255,255,255,.3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px}
+.line-chart-wrap{position:relative;width:100%;height:110px}
+.lc-legend{display:flex;gap:14px;margin-top:10px;flex-wrap:wrap}
+.lc-leg-item{display:flex;align-items:center;gap:6px;font-size:11px;font-family:var(--mono)}
+.lc-leg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.plat-title{font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px}
+.plat-row{display:flex;align-items:center;gap:9px;margin-bottom:8px}
+.plat-dot{width:8px;height:8px;border-radius:3px;flex-shrink:0}
+.plat-name{font-size:12px;color:var(--text2);flex:1}
+.plat-n{font-size:12px;font-family:var(--mono);font-weight:500;color:var(--text)}
+.plat-track{flex:2;height:3px;background:var(--bg);border-radius:2px;overflow:hidden}
+.plat-fill{height:100%;border-radius:2px}
+.dash-recent{grid-column:span 2;background:var(--surface);border-radius:var(--r);padding:20px 22px;transition:background .25s}
+.dash-exec{grid-column:span 2;background:var(--orange);border-radius:var(--r);padding:22px 26px}
+.dr-title{font-family:var(--font-display);font-size:15px;font-weight:700;margin-bottom:12px}
+.recent-item{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--bg);border-radius:var(--r-sm);margin-bottom:7px;transition:background .25s}
+.ri-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.ri-title{font-size:12px;font-weight:500;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ri-badge{font-size:10px;font-family:var(--mono);padding:3px 8px;border-radius:20px;background:var(--surface);color:var(--text2);flex-shrink:0}
+.de-label{font-size:10px;color:rgba(255,255,255,.5);font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.de-big{font-family:var(--font-display);font-size:48px;font-weight:800;color:#fff;letter-spacing:-3px;line-height:1;margin-bottom:4px}
+.de-sub{font-size:12px;color:rgba(255,255,255,.6);margin-bottom:14px}
+.de-prog-track{height:5px;background:rgba(255,255,255,.2);border-radius:3px;overflow:hidden}
+.de-prog-fill{height:100%;background:#fff;border-radius:3px;transition:width .6s ease}
+.de-stats{display:flex;gap:18px;margin-top:12px}
+.de-sv{font-family:var(--font-display);font-size:22px;font-weight:700;color:#fff;line-height:1}
+.de-sl{font-size:10px;color:rgba(255,255,255,.5);margin-top:2px}
+/* CALENDAR */
+.cal-shell{background:var(--surface);border-radius:var(--r);overflow:hidden;transition:background .25s}
+.cal-top{display:flex;align-items:center;gap:12px;padding:18px 22px 0}
+.cal-month-lbl{font-family:var(--font-display);font-size:19px;font-weight:800;letter-spacing:-.5px}
+.cal-nav{width:30px;height:30px;border:1.5px solid var(--border);border-radius:50%;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--text2)}
+.cal-nav:hover{background:var(--bg)}
+.cal-sep{flex:1}
+.cal-toggle{display:flex;gap:3px;background:var(--bg);padding:3px;border-radius:9px;transition:background .25s}
+.ct-btn{padding:5px 13px;border-radius:7px;font-size:12px;font-weight:500;cursor:pointer;border:none;background:none;color:var(--text3);font-family:var(--font)}
+.ct-btn.active{background:var(--surface);color:var(--text)}
+.cal-grid-wrap{padding:14px 18px 18px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.cal-hdr{padding:7px 5px;font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em}
+.cal-day{min-height:84px;padding:7px 5px;cursor:pointer;border-radius:var(--r-xs);transition:background .1s}
+.cal-day:hover{background:var(--bg)}
+.cal-day.other{opacity:.3}
+.cal-day.today .dn{background:var(--dark);color:var(--surface);border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;margin-left:-1px}
+.dn{font-size:12px;color:var(--text3);font-family:var(--mono);margin-bottom:4px}
+.cal-chip{padding:2px 6px;border-radius:5px;font-size:10px;font-weight:600;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+/* KANBAN */
+.kanban-wrap{display:flex;gap:10px;overflow-x:auto;padding-bottom:10px}
+.k-col{min-width:215px;width:215px;display:flex;flex-direction:column;flex-shrink:0;max-height:calc(100dvh - 100px)}
+.k-col-head{padding:12px 4px 8px;display:flex;align-items:center;justify-content:space-between}
+.k-col-name{font-family:var(--font-display);font-size:13px;font-weight:700}
+.k-col-badge{background:var(--surface);border-radius:20px;padding:2px 7px;font-size:11px;font-family:var(--mono);color:var(--text2)}
+.k-col-body{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:7px;padding:2px}
+.k-card{background:var(--surface);border-radius:var(--r-sm);padding:13px;cursor:grab;border:1.5px solid transparent;transition:all .14s}
+.k-card:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(0,0,0,.08)}
+.k-card.dragging{opacity:.3}
+.k-card.drag-over{border-color:var(--orange)}
+.k-col.drag-over-col{opacity:.8}
+.kc-plat{font-size:10px;font-family:var(--mono);color:var(--text3);margin-bottom:6px;text-transform:uppercase}
+.kc-title{font-size:13px;font-weight:600;font-family:var(--font-display);color:var(--text);line-height:1.35;margin-bottom:8px}
+.kc-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:4px}
+.kc-date{font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:6px}
+.k-add-btn{width:100%;padding:9px;border:1.5px dashed var(--border2);background:none;border-radius:var(--r-sm);color:var(--text3);font-size:12px;cursor:pointer;font-family:var(--font);margin-top:4px;transition:all .14s}
+.k-add-btn:hover{color:var(--text2);background:var(--surface)}
+.k-empty{padding:18px 10px;text-align:center;font-size:12px;color:var(--text3)}
+/* IDEAS */
+.ideas-top{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.ideas-search{flex:1;padding:10px 16px;background:var(--surface);border:1.5px solid var(--border);border-radius:50px;color:var(--text);font-size:13px;font-family:var(--font)}
+.ideas-search:focus{outline:none;border-color:var(--border2)}
+.ideas-search::placeholder{color:var(--text3)}
+.ideas-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
+.idea-card{border-radius:var(--r);padding:18px;transition:background .25s}
+.ic-white{background:var(--surface)}
+.ic-dark{background:var(--dark)}
+.ic-purple{background:var(--purple-bg)}
+.idea-hook{font-family:var(--font-display);font-size:14px;font-weight:700;line-height:1.4;margin-bottom:10px}
+.ic-white .idea-hook{color:var(--text)}
+.ic-dark .idea-hook{color:var(--surface)}
+.ic-purple .idea-hook{color:var(--purple-dark)}
+.idea-meta{display:flex;flex-direction:column;gap:5px;margin-bottom:8px}
+.ima-row{display:flex;gap:8px}
+.ima-lbl{font-size:10px;font-family:var(--mono);min-width:65px;padding-top:1px;text-transform:uppercase;letter-spacing:.05em}
+.ic-white .ima-lbl{color:var(--text3)}
+.ic-dark .ima-lbl{color:rgba(255,255,255,.3)}
+.ic-purple .ima-lbl{color:rgba(61,53,128,.4)}
+.ima-val{font-size:12px;line-height:1.4}
+.ic-white .ima-val{color:var(--text2)}
+.ic-dark .ima-val{color:rgba(255,255,255,.6)}
+.ic-purple .ima-val{color:rgba(61,53,128,.7)}
+.idea-labels{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px}
+.idea-actions{display:flex;gap:8px}
+.idea-pri{padding:7px 14px;border-radius:50px;font-size:12px;font-weight:600;cursor:pointer;border:none;font-family:var(--font)}
+.ic-white .idea-pri{background:var(--dark);color:var(--surface)}
+.ic-dark .idea-pri{background:var(--orange);color:#fff}
+.ic-purple .idea-pri{background:var(--purple-dark);color:#fff}
+.idea-sec{padding:7px 14px;border-radius:50px;font-size:12px;cursor:pointer;background:none;font-family:var(--font)}
+.ic-white .idea-sec{border:1.5px solid var(--border2);color:var(--text3)}
+.ic-dark .idea-sec{border:1.5px solid rgba(255,255,255,.15);color:rgba(255,255,255,.45)}
+.ic-purple .idea-sec{border:1.5px solid rgba(61,53,128,.2);color:rgba(61,53,128,.55)}
+/* TAG SELECTOR in modal */
+.tag-selector{display:flex;flex-wrap:wrap;gap:6px}
+.ts-pill{padding:5px 12px;border-radius:50px;font-size:12px;font-weight:500;cursor:pointer;border:1.5px solid var(--border2);background:none;color:var(--text2);font-family:var(--font);transition:all .12s;user-select:none}
+.ts-pill:hover{border-color:var(--orange);color:var(--orange)}
+.ts-pill.sel{color:#fff!important}
+/* label chip */
+.lbl-chip{padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600}
+/* TAGS */
+.tags-bento{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tag-panel{border-radius:var(--r);padding:22px;transition:background .25s}
+.tag-panel:nth-child(1){background:var(--dark)}
+.tag-panel:nth-child(2){background:var(--surface)}
+.tag-panel:nth-child(3){background:var(--orange)}
+.tag-panel:nth-child(4){background:var(--purple-bg)}
+.tp-lbl{font-size:10px;font-family:var(--mono);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
+.tag-panel:nth-child(1) .tp-lbl{color:rgba(255,255,255,.3)}
+.tag-panel:nth-child(2) .tp-lbl{color:var(--text3)}
+.tag-panel:nth-child(3) .tp-lbl{color:rgba(255,255,255,.45)}
+.tag-panel:nth-child(4) .tp-lbl{color:rgba(61,53,128,.4)}
+.tp-title{font-family:var(--font-display);font-size:17px;font-weight:800;margin-bottom:4px}
+.tag-panel:nth-child(1) .tp-title{color:var(--surface)}
+.tag-panel:nth-child(2) .tp-title{color:var(--text)}
+.tag-panel:nth-child(3) .tp-title{color:#fff}
+.tag-panel:nth-child(4) .tp-title{color:var(--purple-dark)}
+.tp-desc{font-size:11px;margin-bottom:14px}
+.tag-panel:nth-child(1) .tp-desc{color:rgba(255,255,255,.35)}
+.tag-panel:nth-child(2) .tp-desc{color:var(--text3)}
+.tag-panel:nth-child(3) .tp-desc{color:rgba(255,255,255,.5)}
+.tag-panel:nth-child(4) .tp-desc{color:rgba(61,53,128,.5)}
+.tags-flex{display:flex;flex-wrap:wrap;gap:6px}
+.tag-pill{padding:6px 13px;border-radius:50px;font-size:12px;font-weight:500;cursor:pointer;border:1.5px solid transparent;transition:all .12s;user-select:none;display:inline-flex;align-items:center;gap:4px}
+.tag-panel:nth-child(1) .tag-pill{background:rgba(255,255,255,.1);color:rgba(255,255,255,.75)}
+.tag-panel:nth-child(2) .tag-pill{background:var(--bg);color:var(--text2)}
+.tag-panel:nth-child(3) .tag-pill{background:rgba(255,255,255,.15);color:#fff}
+.tag-panel:nth-child(4) .tag-pill{background:rgba(61,53,128,.12);color:var(--purple-dark)}
+.tag-add{padding:6px 13px;border-radius:50px;font-size:12px;cursor:pointer;font-family:var(--font);background:none}
+.tag-panel:nth-child(1) .tag-add{border:1.5px dashed rgba(255,255,255,.2);color:rgba(255,255,255,.4)}
+.tag-panel:nth-child(2) .tag-add{border:1.5px dashed var(--border2);color:var(--text3)}
+.tag-panel:nth-child(3) .tag-add{border:1.5px dashed rgba(255,255,255,.3);color:rgba(255,255,255,.6)}
+.tag-panel:nth-child(4) .tag-add{border:1.5px dashed rgba(61,53,128,.25);color:rgba(61,53,128,.5)}
+.tag-del{font-size:12px;opacity:.5;background:none;border:none;cursor:pointer;padding:0;line-height:1;color:inherit}
+.tag-del:hover{opacity:1}
+/* CLIENTS */
+.clients-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-bottom:14px}
+.client-card{border-radius:var(--r);padding:20px;cursor:pointer;border:2px solid transparent;transition:all .14s;position:relative}
+.client-card:nth-child(3n+1){background:var(--surface)}
+.client-card:nth-child(3n+2){background:var(--dark)}
+.client-card:nth-child(3n){background:var(--purple-bg)}
+.client-card.active-c{border-color:var(--orange)!important}
+.cc-av{width:42px;height:42px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:14px;font-weight:800;margin-bottom:12px}
+.cc-name{font-family:var(--font-display);font-size:15px;font-weight:700;margin-bottom:3px}
+.client-card:nth-child(3n+1) .cc-name{color:var(--text)}
+.client-card:nth-child(3n+2) .cc-name{color:var(--surface)}
+.client-card:nth-child(3n) .cc-name{color:var(--purple-dark)}
+.cc-niche{font-size:12px;margin-bottom:12px}
+.client-card:nth-child(3n+1) .cc-niche{color:var(--text3)}
+.client-card:nth-child(3n+2) .cc-niche{color:rgba(255,255,255,.4)}
+.client-card:nth-child(3n) .cc-niche{color:rgba(61,53,128,.5)}
+.cc-stats{display:flex;gap:14px}
+.cc-sv{font-family:var(--font-display);font-size:19px;font-weight:800}
+.client-card:nth-child(3n+1) .cc-sv{color:var(--text)}
+.client-card:nth-child(3n+2) .cc-sv{color:var(--surface)}
+.client-card:nth-child(3n) .cc-sv{color:var(--purple-dark)}
+.cc-sl{font-size:10px;font-family:var(--mono)}
+.client-card:nth-child(3n+1) .cc-sl{color:var(--text3)}
+.client-card:nth-child(3n+2) .cc-sl{color:rgba(255,255,255,.3)}
+.client-card:nth-child(3n) .cc-sl{color:rgba(61,53,128,.4)}
+.cc-active{font-size:10px;font-family:var(--mono);color:var(--orange);margin-top:10px}
+.cc-del{position:absolute;top:14px;right:14px;width:26px;height:26px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;opacity:0;transition:opacity .14s}
+.client-card:nth-child(3n+1) .cc-del{background:rgba(0,0,0,.07);color:var(--text3)}
+.client-card:nth-child(3n+2) .cc-del{background:rgba(255,255,255,.1);color:rgba(255,255,255,.5)}
+.client-card:nth-child(3n) .cc-del{background:rgba(61,53,128,.1);color:rgba(61,53,128,.5)}
+.client-card:hover .cc-del{opacity:1}
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border-radius:var(--r);width:100%;max-width:510px;max-height:88dvh;overflow-y:auto;animation:mIn .2s cubic-bezier(.4,0,.2,1);transition:background .25s}
+@keyframes mIn{from{opacity:0;transform:scale(.95) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.modal-head{padding:20px 22px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:1;border-radius:var(--r) var(--r) 0 0;transition:background .25s}
+.modal-title{font-family:var(--font-display);font-size:18px;font-weight:800}
+.modal-close{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--border);background:none;cursor:pointer;color:var(--text3);font-size:18px;display:flex;align-items:center;justify-content:center}
+.modal-close:hover{background:var(--bg)}
+.modal-body{padding:20px 22px;display:flex;flex-direction:column;gap:14px}
+.modal-foot{padding:14px 22px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-label{font-size:11px;color:var(--text3);font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase}
+.form-input,.form-select,.form-textarea{background:var(--bg);border:1.5px solid transparent;border-radius:var(--r-sm);padding:10px 13px;font-size:14px;color:var(--text);font-family:var(--font);width:100%;outline:none;transition:all .14s}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--orange);background:var(--surface)}
+.form-input::placeholder{color:var(--text3)}
+.form-textarea{min-height:88px;resize:vertical;line-height:1.6}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+/* LOADING */
+.loading-screen{position:fixed;inset:0;background:var(--surface);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:999;transition:opacity .4s}
+.loading-screen.gone{opacity:0;pointer-events:none}
+.loading-logo{font-family:var(--font-display);font-size:26px;font-weight:800}
+.loading-bar{width:110px;height:3px;background:var(--bg);border-radius:2px;overflow:hidden}
+.loading-anim{height:100%;background:var(--orange);border-radius:2px;animation:lAnim 1.1s ease infinite}
+@keyframes lAnim{0%{width:0;margin-left:0}50%{width:80%;margin-left:0}100%{width:0;margin-left:110px}}
+.loading-msg{font-size:12px;color:var(--text3);font-family:var(--mono)}
+/* TOAST */
+.toast{position:fixed;bottom:calc(28px + var(--safe-bot));left:50%;transform:translateX(-50%) translateY(70px);background:var(--dark);color:var(--surface);padding:10px 20px;border-radius:50px;font-size:13px;font-weight:500;z-index:300;transition:transform .25s cubic-bezier(.4,0,.2,1);pointer-events:none;white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0)}
+/* OFFLINE */
+.offline-banner{display:none;background:#e53;color:#fff;text-align:center;font-size:12px;font-family:var(--mono);padding:6px}
+.offline-banner.show{display:block}
+/* MOBILE */
+@media(max-width:768px){
+  .sidebar{position:fixed;left:0;top:0;bottom:0;z-index:100;transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0);box-shadow:8px 0 30px rgba(0,0,0,.15)}
+  .sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:99}
+  .sb-overlay.open{display:block}
+  .hamburger{display:flex!important}
+  .dash-bento{grid-template-columns:1fr 1fr}
+  .dash-status,.dash-plats,.dash-recent,.dash-exec{grid-column:span 2}
+  .tags-bento{grid-template-columns:1fr}
+  .content{padding:0 12px 16px}
+  .topbar{padding:0 14px}
+  .btn:not(.btn-dark):not(.btn-orange){display:none}
 }
 </style>
 </head>
 <body>
-
 <div class="loading-screen" id="loadingScreen">
   <div class="loading-logo">ContentFlow</div>
   <div class="loading-bar"><div class="loading-anim"></div></div>
   <div class="loading-msg" id="loadingMsg">Carregando dados...</div>
 </div>
-
-<div class="offline-banner" id="offlineBanner">Você está offline — alterações serão sincronizadas quando a internet voltar</div>
-
+<div class="offline-banner" id="offlineBanner">Offline — sincroniza quando a internet voltar</div>
 <div class="sb-overlay" id="sbOverlay" onclick="closeSidebar()"></div>
-
 <div class="app">
   <div class="sidebar" id="sidebar">
     <div class="sb-head">
@@ -348,6 +381,7 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
         <div class="logo-mark"><svg viewBox="0 0 18 18" fill="none"><path d="M2 14L7 4L12 10L15 7L16 14H2Z" fill="white"/></svg></div>
         <div class="logo-name">ContentFlow</div>
       </div>
+      <button class="dark-toggle" id="darkToggle" onclick="toggleDark()" title="Modo escuro"></button>
     </div>
     <div class="sb-body">
       <div class="nav-label">workspace</div>
@@ -384,16 +418,12 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
         <span class="sync-pending" id="syncPending">↑ pendente</span>
       </div>
       <div class="client-chip" onclick="openClientPicker()">
-        <div class="c-av" id="sb-av" style="background:rgba(167,139,250,0.2);color:#5b4fcf;">CF</div>
-        <div style="flex:1;min-width:0;">
-          <div class="c-name" id="sb-cname">Carregando...</div>
-          <div class="c-role" id="sb-crole">—</div>
-        </div>
-        <span style="color:var(--text3);font-size:11px;">⌄</span>
+        <div class="c-av" id="sb-av" style="background:rgba(167,139,250,.2);color:#5b4fcf;">CF</div>
+        <div style="flex:1;min-width:0"><div class="c-name" id="sb-cname">Carregando...</div><div class="c-role" id="sb-crole">—</div></div>
+        <span style="color:var(--text3);font-size:11px">⌄</span>
       </div>
     </div>
   </div>
-
   <div class="main">
     <div class="topbar">
       <button class="hamburger" style="display:none" onclick="toggleSidebar()">
@@ -407,11 +437,11 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
     <div class="content">
       <div id="view-dashboard" class="view active">
         <div class="dash-bento">
-          <div class="dash-metric dm-white"><div class="dm-label">POSTADOS</div><div class="dm-value" id="dm-p">—</div><div class="dm-sub" id="dm-ps">este mês</div></div>
+          <div class="dash-metric dm-white"><div class="dm-label">POSTADOS</div><div class="dm-value" id="dm-p">—</div><div class="dm-sub">este mês</div></div>
           <div class="dash-metric dm-dark"><div class="dm-label">EXECUÇÃO</div><div class="dm-value" id="dm-r">—</div><div class="dm-prog-track"><div class="dm-fill" id="dm-rf" style="background:var(--orange);width:0%"></div></div><div class="dm-sub" id="dm-rs">—</div></div>
           <div class="dash-metric dm-orange"><div class="dm-label">EM PRODUÇÃO</div><div class="dm-value" id="dm-i">—</div><div class="dm-sub">cards ativos</div></div>
           <div class="dash-metric dm-purple"><div class="dm-label">IDEIAS</div><div class="dm-value" id="dm-id">—</div><div class="dm-sub">no banco</div></div>
-          <div class="dash-status"><div class="ds-title">CONTEÚDOS POR STATUS</div><div class="status-bars" id="dash-bars"></div></div>
+          <div class="dash-status"><div class="ds-title">EVOLUÇÃO DE CONTEÚDOS</div><div class="line-chart-wrap" id="lineChartWrap"></div><div class="lc-legend" id="lcLegend"></div></div>
           <div class="dash-plats"><div class="plat-title">POR PLATAFORMA</div><div id="dash-plats"></div></div>
           <div class="dash-recent"><div class="dr-title">Recentes</div><div id="dash-recent-list"></div></div>
           <div class="dash-exec"><div class="de-label">EXECUÇÃO DO MÊS</div><div class="de-big" id="de-big">—/—</div><div class="de-sub">conteúdos finalizados</div><div class="de-prog-track"><div class="de-prog-fill" id="de-pf" style="width:0%"></div></div><div class="de-stats"><div><div class="de-sv" id="de-plan">—</div><div class="de-sl">planejados</div></div><div><div class="de-sv" id="de-done">—</div><div class="de-sl">postados</div></div><div><div class="de-sv" id="de-wip">—</div><div class="de-sl">em andamento</div></div></div></div>
@@ -420,14 +450,11 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
       <div id="view-calendar" class="view">
         <div class="cal-shell">
           <div class="cal-top">
-            <button class="cal-nav" onclick="chMonth(-1)">‹</button>
+            <button class="cal-nav" onclick="chMonth(-1)">&#8249;</button>
             <span class="cal-month-lbl" id="cal-lbl">—</span>
-            <button class="cal-nav" onclick="chMonth(1)">›</button>
+            <button class="cal-nav" onclick="chMonth(1)">&#8250;</button>
             <div class="cal-sep"></div>
-            <div class="cal-toggle">
-              <button class="ct-btn active" onclick="ctg(this)">Mensal</button>
-              <button class="ct-btn" onclick="ctg(this)">Semanal</button>
-            </div>
+            <div class="cal-toggle"><button class="ct-btn active" onclick="ctg(this)">Mensal</button><button class="ct-btn" onclick="ctg(this)">Semanal</button></div>
           </div>
           <div class="cal-grid-wrap"><div class="cal-grid" id="cal-grid"></div></div>
         </div>
@@ -441,337 +468,188 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
         <div class="ideas-grid" id="ideas-grid"></div>
       </div>
       <div id="view-tags" class="view"><div class="tags-bento" id="tags-bento"></div></div>
-      <div id="view-clients" class="view"><div class="clients-grid" id="clients-grid"></div><button class="btn btn-dark" onclick="openClientModal()">+ Novo cliente</button></div>
+      <div id="view-clients" class="view">
+        <div class="clients-grid" id="clients-grid"></div>
+        <button class="btn btn-dark" onclick="openClientModal()">+ Novo cliente</button>
+      </div>
     </div>
   </div>
 </div>
-
 <div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
   <div class="modal">
-    <div class="modal-head"><div class="modal-title" id="modal-title">—</div><button class="modal-close" onclick="closeModal()">×</button></div>
+    <div class="modal-head"><div class="modal-title" id="modal-title">—</div><button class="modal-close" onclick="closeModal()">&#215;</button></div>
     <div class="modal-body" id="modal-body"></div>
     <div class="modal-foot" id="modal-foot"><button class="btn" onclick="closeModal()">Cancelar</button><button class="btn btn-dark" onclick="saveModal()">Salvar</button></div>
   </div>
 </div>
-
 <div class="toast" id="toast"></div>
-
 <script type="module">
-import { initializeApp }                        from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, set, onValue }       from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-// ── FIREBASE ──
-const fbApp = initializeApp({
-  apiKey: "AIzaSyD6zOFXPyisJ6FjIUqBuivwsesXKtnNRN0",
-  authDomain: "contentflow-c0c02.firebaseapp.com",
-  databaseURL: "https://contentflow-c0c02-default-rtdb.firebaseio.com",
-  projectId: "contentflow-c0c02",
-  storageBucket: "contentflow-c0c02.firebasestorage.app",
-  messagingSenderId: "677901651939",
-  appId: "1:677901651939:web:f777637aa04105feaedad6"
-});
-const db = getDatabase(fbApp);
-
-// ── INDEXEDDB (armazenamento local offline) ──
-const IDB_NAME = 'contentflow', IDB_VER = 1, IDB_STORE = 'state';
-let idb;
-
-function openIDB() {
-  return new Promise((res, rej) => {
-    const req = indexedDB.open(IDB_NAME, IDB_VER);
-    req.onupgradeneeded = e => e.target.result.createObjectStore(IDB_STORE);
-    req.onsuccess = e => { idb = e.target.result; res(idb); };
-    req.onerror   = e => rej(e);
-  });
-}
-function idbGet(key) {
-  return new Promise((res, rej) => {
-    const tx = idb.transaction(IDB_STORE, 'readonly');
-    const req = tx.objectStore(IDB_STORE).get(key);
-    req.onsuccess = () => res(req.result);
-    req.onerror   = () => rej();
-  });
-}
-function idbSet(key, val) {
-  return new Promise((res, rej) => {
-    const tx = idb.transaction(IDB_STORE, 'readwrite');
-    const req = tx.objectStore(IDB_STORE).put(val, key);
-    req.onsuccess = () => res();
-    req.onerror   = () => rej();
-  });
-}
-
-// ── DEFAULT DATA ──
-const DEFAULT = {
-  activeClient: 0,
-  clients: [
-    { id:1, name:'Maria Costa',   niche:'Advocacia',        bg:'rgba(167,139,250,0.2)', fg:'#5b4fcf', initials:'MC' },
-    { id:2, name:'Café Pinheiro', niche:'Food & Beverage',  bg:'rgba(251,191,36,0.2)',  fg:'#92630a', initials:'CP' },
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import{getDatabase,ref,set,onValue}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+const fbApp=initializeApp({apiKey:"AIzaSyD6zOFXPyisJ6FjIUqBuivwsesXKtnNRN0",authDomain:"contentflow-c0c02.firebaseapp.com",databaseURL:"https://contentflow-c0c02-default-rtdb.firebaseio.com",projectId:"contentflow-c0c02",storageBucket:"contentflow-c0c02.firebasestorage.app",messagingSenderId:"677901651939",appId:"1:677901651939:web:f777637aa04105feaedad6"});
+const db=getDatabase(fbApp);
+// IDB
+const IDB_NAME='cf4',IDB_STORE='state';let idb;
+function openIDB(){return new Promise((res,rej)=>{const r=indexedDB.open(IDB_NAME,1);r.onupgradeneeded=e=>e.target.result.createObjectStore(IDB_STORE);r.onsuccess=e=>{idb=e.target.result;res();};r.onerror=()=>rej();});}
+function idbGet(k){return new Promise((res,rej)=>{const r=idb.transaction(IDB_STORE,'readonly').objectStore(IDB_STORE).get(k);r.onsuccess=()=>res(r.result);r.onerror=()=>rej();});}
+function idbSet(k,v){return new Promise((res,rej)=>{const r=idb.transaction(IDB_STORE,'readwrite').objectStore(IDB_STORE).put(v,k);r.onsuccess=()=>res();r.onerror=()=>rej();});}
+// DEFAULT
+const DEF={activeClient:0,darkMode:false,calMonth:{y:2026,m:2},pendingSync:false,
+  clients:[{id:1,name:'Maria Costa',niche:'Advocacia',bg:'rgba(167,139,250,.2)',fg:'#5b4fcf',initials:'MC'},{id:2,name:'Café Pinheiro',niche:'Food & Beverage',bg:'rgba(251,191,36,.2)',fg:'#92630a',initials:'CP'}],
+  contents:[
+    {id:1,cid:1,title:'5 erros antes de contratar advogado',platform:'Instagram',type:'Reels',goal:'Autoridade',status:'Postado',date:'2026-03-05',theme:'Direito do consumidor',script:'',labels:[]},
+    {id:2,cid:1,title:'Pode contestar multa de trânsito?',platform:'TikTok',type:'Reels',goal:'Engajamento',status:'Postado',date:'2026-03-08',theme:'Direito de trânsito',script:'',labels:[]},
+    {id:3,cid:1,title:'Direitos que o trabalhador não sabe',platform:'Instagram',type:'Carrossel',goal:'Autoridade',status:'Em edição',date:'2026-03-20',theme:'Direito trabalhista',script:'',labels:['Educativo']},
+    {id:4,cid:1,title:'Como funciona um divórcio consensual',platform:'Instagram',type:'Story',goal:'Autoridade',status:'Em gravação',date:'2026-03-22',theme:'Família',script:'',labels:['Autoridade']},
+    {id:5,cid:1,title:'Tendências direito digital 2026',platform:'LinkedIn',type:'Artigo',goal:'Autoridade',status:'Aprovado',date:'2026-03-26',theme:'Direito digital',script:'',labels:['Topo']},
+    {id:6,cid:1,title:'Dia a dia num escritório de advocacia',platform:'Instagram',type:'Reels',goal:'Engajamento',status:'Em desenvolvimento',date:'2026-03-28',theme:'Bastidores',script:'',labels:['Viral']},
+    {id:7,cid:1,title:'Nunca assine isso num contrato',platform:'TikTok',type:'Reels',goal:'Engajamento',status:'Ideia',date:'2026-04-02',theme:'Imobiliário',script:'',labels:[]},
   ],
-  contents: [
-    { id:1, cid:1, title:'5 erros antes de contratar advogado', platform:'Instagram', type:'Reels',    goal:'Autoridade',  status:'Postado',          date:'2026-03-05', theme:'Direito do consumidor', script:'' },
-    { id:2, cid:1, title:'Pode contestar multa de trânsito?',   platform:'TikTok',    type:'Reels',    goal:'Engajamento', status:'Postado',          date:'2026-03-08', theme:'Direito de trânsito',   script:'' },
-    { id:3, cid:1, title:'Direitos que o trabalhador não sabe', platform:'Instagram', type:'Carrossel',goal:'Autoridade',  status:'Em edição',        date:'2026-03-20', theme:'Direito trabalhista',   script:'' },
-    { id:4, cid:1, title:'Como funciona um divórcio consensual',platform:'Instagram', type:'Story',    goal:'Autoridade',  status:'Em gravação',      date:'2026-03-22', theme:'Família',               script:'' },
-    { id:5, cid:1, title:'Tendências direito digital 2026',     platform:'LinkedIn',  type:'Artigo',   goal:'Autoridade',  status:'Aprovado',         date:'2026-03-26', theme:'Direito digital',       script:'' },
-    { id:6, cid:1, title:'Dia a dia num escritório de advocacia',platform:'Instagram',type:'Reels',    goal:'Engajamento', status:'Em desenvolvimento',date:'2026-03-28', theme:'Bastidores',            script:'' },
-    { id:7, cid:1, title:'Nunca assine isso num contrato',      platform:'TikTok',    type:'Reels',    goal:'Engajamento', status:'Ideia',            date:'2026-04-02', theme:'Imobiliário',           script:'' },
+  ideas:[
+    {id:1,cid:1,hook:'"Você pode estar perdendo dinheiro sem saber"',ref:'Pergunta de seguidor',format:'Carrossel 5 slides',funnel:'Topo',labels:['Educativo','Topo']},
+    {id:2,cid:1,hook:'O dia em que meu cliente ganhou 60 mil reais',ref:'Dor: insegurança jurídica',format:'Reels narrativo 60s',funnel:'Meio',labels:['Autoridade']},
   ],
-  ideas: [
-    { id:1, cid:1, hook:'"Você pode estar perdendo dinheiro sem saber"', ref:'Pergunta de seguidor: "fui mandado embora, e agora?"', format:'Carrossel 5 slides', funnel:'Topo' },
-    { id:2, cid:1, hook:'O dia em que meu cliente ganhou 60 mil por não saber de um direito', ref:'Dor: insegurança jurídica', format:'Reels narrativo 60s', funnel:'Meio' },
-  ],
-  tags: {
-    nicho:     [{l:'Jurídico'},{l:'Food'},{l:'Moda'},{l:'Fitness'},{l:'Tech'}],
-    funil:     [{l:'Topo'},{l:'Meio'},{l:'Fundo'}],
-    estrategia:[{l:'Viral'},{l:'Educativo'},{l:'Conversão'},{l:'Autoridade'}],
-    dor:       [{l:'Insegurança'},{l:'Medo de errar'},{l:'Falta de tempo'}],
-  },
-  calMonth: { y:2026, m:2 },
-  pendingSync: false,
+  tags:{
+    nicho:[{l:'Jurídico',c:'#7c3aed'},{l:'Food',c:'#d97706'},{l:'Moda',c:'#db2777'},{l:'Fitness',c:'#059669'},{l:'Tech',c:'#2563eb'}],
+    funil:[{l:'Topo',c:'#2563eb'},{l:'Meio',c:'#d97706'},{l:'Fundo',c:'#dc2626'}],
+    estrategia:[{l:'Viral',c:'#7c3aed'},{l:'Educativo',c:'#059669'},{l:'Conversão',c:'#dc2626'},{l:'Autoridade',c:'#2563eb'}],
+    dor:[{l:'Insegurança',c:'#d97706'},{l:'Medo de errar',c:'#dc2626'},{l:'Falta de tempo',c:'#db2777'}],
+  }
 };
-
-// ── STATE ──
-let S = JSON.parse(JSON.stringify(DEFAULT));
-let currentModal = null, dragId = null, dragFrom = null;
-let isOnline = navigator.onLine;
-let fbListening = false;
-
-// ── HELPERS ──
-const STATUSES = ['Ideia','Em desenvolvimento','Em gravação','Em edição','Aprovado','Postado'];
-const MONTHS   = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-const PLAT_COLORS = { Instagram:'#e1306c', TikTok:'#ff0050', LinkedIn:'#0a66c2', YouTube:'#ff0000', 'Twitter/X':'#1da1f2', Pinterest:'#e60023' };
-const STATUS_COLORS = { Postado:'#2a9d5c', 'Em edição':'#f04e23', 'Em gravação':'#f59e0b', Aprovado:'#2a9d5c', Ideia:'#a78bfa', 'Em desenvolvimento':'#60a5fa' };
-
-function cc() { return (S.contents||[]).filter(c => c.cid === (S.clients[S.activeClient]||{}).id); }
-function ci() { return (S.ideas||[]).filter(i => i.cid === (S.clients[S.activeClient]||{}).id); }
-function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function fmtDate(d) { if(!d) return ''; const [,m,day]=d.split('-'); return `${day}/${m}`; }
-
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2400);
+let S=JSON.parse(JSON.stringify(DEF));
+let currentModal=null,dragId=null,dragFrom=null,isOnline=navigator.onLine,fbListening=false;
+// DARK
+window.toggleDark=()=>{S.darkMode=!S.darkMode;applyDark();save();};
+function applyDark(){document.body.classList.toggle('dark',!!S.darkMode);if(document.getElementById('view-dashboard').classList.contains('active'))renderLineChart();}
+// NET
+function updateNet(){isOnline=navigator.onLine;document.getElementById('offlineBanner').classList.toggle('show',!isOnline);if(isOnline){setSS('syncing');if(S.pendingSync)pushFB();if(!fbListening)startFB();}else setSS('offline');}
+window.addEventListener('online',updateNet);window.addEventListener('offline',updateNet);
+function setSS(s){document.getElementById('syncDot').className='sync-dot '+s;document.getElementById('syncLabel').textContent={online:'Sincronizado',syncing:'Sincronizando...',offline:'Offline'}[s];document.getElementById('syncPending').classList.toggle('show',s==='offline'&&S.pendingSync);}
+// SAVE
+async function save(){await idbSet('state',S);applyDark();if(isOnline){S.pendingSync=false;pushFB();}else{S.pendingSync=true;await idbSet('state',S);setSS('offline');}updateUI();}
+function pushFB(){setSS('syncing');set(ref(db,'data'),{clients:S.clients,contents:S.contents,ideas:S.ideas,tags:S.tags,activeClient:S.activeClient,darkMode:S.darkMode}).then(()=>{S.pendingSync=false;idbSet('state',S);setSS('online');}).catch(()=>{S.pendingSync=true;setSS('offline');});}
+function startFB(){if(fbListening||!isOnline)return;fbListening=true;onValue(ref(db,'data'),snap=>{const v=snap.val();if(!v){pushFB();return;}S={...S,...v,clients:Array.isArray(v.clients)?v.clients:Object.values(v.clients||{}),contents:Array.isArray(v.contents)?v.contents:Object.values(v.contents||{}),ideas:Array.isArray(v.ideas)?v.ideas:Object.values(v.ideas||{})};idbSet('state',S);applyDark();setSS('online');updateUI();hideLoading();},()=>{setSS('offline');hideLoading();});}
+function hideLoading(){const el=document.getElementById('loadingScreen');el.classList.add('gone');setTimeout(()=>el.style.display='none',450);}
+// UI
+function updateUI(){updateSB();updateBadges();const v=document.querySelector('.view.active')?.id?.replace('view-','');if(v==='dashboard')renderDashboard();if(v==='calendar')renderCalendar();if(v==='kanban')renderKanban();if(v==='ideas')renderIdeas();if(v==='tags')renderTags();if(v==='clients')renderClients();}
+function updateSB(){const c=(S.clients||[])[S.activeClient];if(!c)return;document.getElementById('sb-av').textContent=c.initials;document.getElementById('sb-av').style.background=c.bg;document.getElementById('sb-av').style.color=c.fg;document.getElementById('sb-cname').textContent=c.name;document.getElementById('sb-crole').textContent=c.niche;}
+function updateBadges(){const c=cc(),id=ci();document.getElementById('b-cal').textContent=c.length;document.getElementById('b-kan').textContent=c.filter(x=>x.status!=='Postado').length;document.getElementById('b-ideas').textContent=id.length;document.getElementById('b-cli').textContent=(S.clients||[]).length;}
+const STATUSES=['Ideia','Em desenvolvimento','Em gravação','Em edição','Aprovado','Postado'];
+const MONTHS=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const PLATC={Instagram:'#e1306c',TikTok:'#ff0050',LinkedIn:'#0a66c2',YouTube:'#ff0000','Twitter/X':'#1da1f2',Pinterest:'#e60023'};
+const STATUSC={Postado:'#2a9d5c','Em edição':'#f04e23','Em gravação':'#f59e0b',Aprovado:'#2a9d5c',Ideia:'#a78bfa','Em desenvolvimento':'#60a5fa'};
+function cc(){return(S.contents||[]).filter(c=>c.cid===(S.clients[S.activeClient]||{}).id);}
+function ci(){return(S.ideas||[]).filter(i=>i.cid===(S.clients[S.activeClient]||{}).id);}
+function allTags(){return Object.values(S.tags||{}).flat();}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function fmtDate(d){if(!d)return'';const[,m,day]=d.split('-');return`${day}/${m}`;}
+function getTagColor(l){const t=allTags().find(x=>x.l===l);return t?.c||'#888';}
+function labelChip(l){const c=getTagColor(l);const r=parseInt(c.slice(1,3),16),g=parseInt(c.slice(3,5),16),b=parseInt(c.slice(5,7),16);const bg=`rgba(${r},${g},${b},.15)`;return`<span class="lbl-chip" style="background:${bg};color:${c}">${l}</span>`;}
+function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400);}
+// NAV
+const TITLES={dashboard:'Dashboard',calendar:'Calendário Editorial',kanban:'Pipeline de Produção',ideas:'Banco de Ideias',tags:'Rótulos',clients:'Clientes'};
+window.nav=function(v,btn){document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));document.getElementById('view-'+v).classList.add('active');document.getElementById('topbar-title').textContent=TITLES[v];closeSidebar();updateUI();};
+window.toggleSidebar=()=>{document.getElementById('sidebar').classList.toggle('open');document.getElementById('sbOverlay').classList.toggle('open');};
+window.closeSidebar=()=>{document.getElementById('sidebar').classList.remove('open');document.getElementById('sbOverlay').classList.remove('open');};
+// DASHBOARD
+function renderDashboard(){
+  const c=cc(),id=ci();
+  const posted=c.filter(x=>x.status==='Postado').length,total=c.length,inProd=c.filter(x=>!['Postado','Ideia'].includes(x.status)).length,rate=total>0?Math.round(posted/total*100):0;
+  document.getElementById('dm-p').textContent=posted;
+  document.getElementById('dm-r').textContent=rate+'%';
+  document.getElementById('dm-rf').style.width=rate+'%';
+  document.getElementById('dm-rs').textContent=total+' no total';
+  document.getElementById('dm-i').textContent=inProd;
+  document.getElementById('dm-id').textContent=id.length;
+  renderLineChart();
+  const plats={};c.forEach(x=>{plats[x.platform]=(plats[x.platform]||0)+1;});
+  const maxP=Math.max(...Object.values(plats),1);
+  document.getElementById('dash-plats').innerHTML=Object.entries(plats).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([p,n])=>`<div class="plat-row"><div class="plat-dot" style="background:${PLATC[p]||'#888'}"></div><span class="plat-name">${p}</span><span class="plat-n">${n}</span><div class="plat-track"><div class="plat-fill" style="width:${Math.round(n/maxP*100)}%;background:${PLATC[p]||'#888'}"></div></div></div>`).join('')||'<span style="color:var(--text3);font-size:12px">Nenhum conteúdo ainda</span>';
+  document.getElementById('dash-recent-list').innerHTML=c.slice(-4).reverse().map(x=>`<div class="recent-item"><div class="ri-dot" style="background:${STATUSC[x.status]||'#888'}"></div><span class="ri-title">${x.title}</span><span class="ri-badge">${x.status}</span></div>`).join('')||'<div style="color:var(--text3);font-size:12px">Nenhum conteúdo ainda</div>';
+  document.getElementById('de-big').textContent=`${posted}/${total}`;
+  document.getElementById('de-pf').style.width=rate+'%';
+  document.getElementById('de-plan').textContent=total;
+  document.getElementById('de-done').textContent=posted;
+  document.getElementById('de-wip').textContent=inProd;
 }
-
-// ── OFFLINE/ONLINE ──
-function updateNetworkStatus() {
-  isOnline = navigator.onLine;
-  document.getElementById('offlineBanner').classList.toggle('show', !isOnline);
-  if (isOnline) {
-    setSyncStatus('syncing');
-    if (S.pendingSync) pushToFirebase();
-    if (!fbListening) startFirebaseSync();
-  } else {
-    setSyncStatus('offline');
+// LINE CHART
+function renderLineChart(){
+  const wrap=document.getElementById('lineChartWrap');if(!wrap)return;
+  const c=cc(),id=ci(),dark=S.darkMode;
+  const weeks=['S1','S2','S3','S4','S5','S6'];
+  const postCounts=c.filter(x=>x.status==='Postado').length;
+  const inProdCount=c.filter(x=>!['Postado','Ideia'].includes(x.status)).length;
+  const ideaCount=id.length;
+  const series=[
+    {label:'Postados',color:'#2a9d5c',data:weeks.map((_,i)=>Math.max(0,Math.round(postCounts*(i+1)/6*(0.7+Math.random()*0.3))))},
+    {label:'Em produção',color:'#f59e0b',data:weeks.map((_,i)=>Math.max(0,Math.round(inProdCount*(i*0.4+0.2)*(0.8+Math.random()*0.4))))},
+    {label:'Ideias',color:'#a78bfa',data:weeks.map((_,i)=>Math.max(0,Math.round(ideaCount*(i+1)/7)))},
+  ];
+  const W=wrap.offsetWidth||360,H=110,pL=28,pR=10,pT=10,pB=22,cW=W-pL-pR,cH=H-pT-pB;
+  const allVals=series.flatMap(s=>s.data);const maxV=Math.max(...allVals,1);
+  const bgCard=dark?'#f0ede8':'#111110';
+  const gridC=dark?'rgba(0,0,0,.08)':'rgba(255,255,255,.08)';
+  const axisC=dark?'rgba(0,0,0,.3)':'rgba(255,255,255,.25)';
+  let svg=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}">`;
+  [0,.5,1].forEach(t=>{const y=pT+cH*(1-t);svg+=`<line x1="${pL}" y1="${y}" x2="${W-pR}" y2="${y}" stroke="${gridC}" stroke-width="1"/>`;if(t>0)svg+=`<text x="${pL-4}" y="${y+4}" text-anchor="end" font-size="9" fill="${axisC}" font-family="monospace">${Math.round(maxV*t)}</text>`;});
+  weeks.forEach((w,wi)=>{const x=pL+wi/(weeks.length-1)*cW;svg+=`<text x="${x}" y="${H-4}" text-anchor="middle" font-size="9" fill="${axisC}" font-family="monospace">${w}</text>`;});
+  series.forEach(sr=>{
+    const pts=weeks.map((_,wi)=>[pL+wi/(weeks.length-1)*cW, pT+cH-(sr.data[wi]/maxV)*cH]);
+    const path=pts.map((p,pi)=>(pi===0?`M${p[0]},${p[1]}`:`L${p[0]},${p[1]}`)).join(' ');
+    const area=path+` L${pts[pts.length-1][0]},${pT+cH} L${pts[0][0]},${pT+cH} Z`;
+    svg+=`<path d="${area}" fill="${sr.color}22" stroke="none"/>`;
+    svg+=`<path d="${path}" fill="none" stroke="${sr.color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>`;
+    pts.forEach(([x,y])=>{svg+=`<circle cx="${x}" cy="${y}" r="3.5" fill="${sr.color}" stroke="${bgCard}" stroke-width="1.5"/>`;});
+  });
+  svg+='</svg>';
+  wrap.innerHTML=svg;
+  document.getElementById('lcLegend').innerHTML=series.map(s=>`<div class="lc-leg-item"><div class="lc-leg-dot" style="background:${s.color}"></div><span style="color:${dark?'rgba(0,0,0,.4)':'rgba(255,255,255,.4)'}">${s.label}</span></div>`).join('');
+}
+// CALENDAR
+function renderCalendar(){
+  const{y,m}=S.calMonth;document.getElementById('cal-lbl').textContent=`${MONTHS[m]} ${y}`;
+  const chipC={Postado:'background:rgba(42,157,92,.15);color:#1f7d47','Em edição':'background:rgba(240,78,35,.12);color:#c03a14','Em gravação':'background:rgba(245,158,11,.12);color:#92630a',Aprovado:'background:rgba(42,157,92,.15);color:#1f7d47',Ideia:'background:rgba(107,107,200,.12);color:#4a45a0','Em desenvolvimento':'background:rgba(37,99,235,.1);color:#1d4ed8'};
+  let html=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'].map(d=>`<div class="cal-hdr">${d}</div>`).join('');
+  const fd=new Date(y,m,1).getDay(),ld=new Date(y,m+1,0).getDate(),today=new Date();
+  for(let i=0;i<fd;i++){const d=new Date(y,m,1-fd+i);html+=`<div class="cal-day other"><div class="dn">${d.getDate()}</div></div>`;}
+  for(let d=1;d<=ld;d++){
+    const isT=today.getFullYear()===y&&today.getMonth()===m&&today.getDate()===d;
+    const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const dc=cc().filter(c=>c.date===ds);
+    html+=`<div class="cal-day${isT?' today':''}" onclick="openContentModal('${ds}')"><div class="dn">${d}</div>${dc.map(c=>`<div class="cal-chip" style="${chipC[c.status]||''}" onclick="event.stopPropagation();editContent(${c.id})">${c.title}</div>`).join('')}</div>`;
   }
+  document.getElementById('cal-grid').innerHTML=html;
 }
-window.addEventListener('online',  updateNetworkStatus);
-window.addEventListener('offline', updateNetworkStatus);
-
-function setSyncStatus(status) {
-  const dot   = document.getElementById('syncDot');
-  const label = document.getElementById('syncLabel');
-  const pend  = document.getElementById('syncPending');
-  dot.className = 'sync-dot ' + status;
-  label.textContent = { online:'Sincronizado', syncing:'Sincronizando...', offline:'Offline' }[status];
-  pend.classList.toggle('show', status === 'offline' && S.pendingSync);
-}
-
-// ── SAVE: local primeiro, depois firebase ──
-async function save() {
-  // 1. salva localmente sempre
-  await idbSet('state', S);
-  // 2. se online, sincroniza com Firebase
-  if (isOnline) {
-    S.pendingSync = false;
-    pushToFirebase();
-  } else {
-    // marca como pendente para sincronizar quando voltar a internet
-    S.pendingSync = true;
-    await idbSet('state', S);
-    setSyncStatus('offline');
-  }
-  updateUI();
-}
-
-function pushToFirebase() {
-  setSyncStatus('syncing');
-  const payload = { clients:S.clients, contents:S.contents, ideas:S.ideas, tags:S.tags, activeClient:S.activeClient };
-  set(ref(db, 'data'), payload)
-    .then(() => { S.pendingSync = false; idbSet('state', S); setSyncStatus('online'); })
-    .catch(() => { S.pendingSync = true; setSyncStatus('offline'); });
-}
-
-// ── FIREBASE REALTIME SYNC ──
-function startFirebaseSync() {
-  if (fbListening || !isOnline) return;
-  fbListening = true;
-  onValue(ref(db, 'data'), snap => {
-    const val = snap.val();
-    if (!val) { pushToFirebase(); return; }
-    // mescla dados remotos no state local
-    S = { ...S, ...val,
-      clients:  Array.isArray(val.clients)  ? val.clients  : Object.values(val.clients||{}),
-      contents: Array.isArray(val.contents) ? val.contents : Object.values(val.contents||{}),
-      ideas:    Array.isArray(val.ideas)    ? val.ideas    : Object.values(val.ideas||{}),
-    };
-    idbSet('state', S);
-    setSyncStatus('online');
-    updateUI();
-    hideLoading();
-  }, () => { setSyncStatus('offline'); hideLoading(); });
-}
-
-// ── LOADING ──
-function hideLoading() {
-  const el = document.getElementById('loadingScreen');
-  el.classList.add('gone');
-  setTimeout(() => el.style.display = 'none', 450);
-}
-function setLoadingMsg(m) { document.getElementById('loadingMsg').textContent = m; }
-
-// ── UI ──
-function updateUI() {
-  updateSidebar();
-  updateBadges();
-  const v = document.querySelector('.view.active')?.id?.replace('view-','');
-  if (v === 'dashboard') renderDashboard();
-  if (v === 'calendar')  renderCalendar();
-  if (v === 'kanban')    renderKanban();
-  if (v === 'ideas')     renderIdeas();
-  if (v === 'tags')      renderTags();
-  if (v === 'clients')   renderClients();
-}
-function updateSidebar() {
-  const c = (S.clients||[])[S.activeClient]; if (!c) return;
-  document.getElementById('sb-av').textContent    = c.initials;
-  document.getElementById('sb-av').style.background = c.bg;
-  document.getElementById('sb-av').style.color    = c.fg;
-  document.getElementById('sb-cname').textContent = c.name;
-  document.getElementById('sb-crole').textContent = c.niche;
-}
-function updateBadges() {
-  const c = cc(), id = ci();
-  document.getElementById('b-cal').textContent   = c.length;
-  document.getElementById('b-kan').textContent   = c.filter(x=>x.status!=='Postado').length;
-  document.getElementById('b-ideas').textContent = id.length;
-  document.getElementById('b-cli').textContent   = (S.clients||[]).length;
-}
-
-// ── NAV ──
-const TITLES = { dashboard:'Dashboard', calendar:'Calendário Editorial', kanban:'Pipeline de Produção', ideas:'Banco de Ideias', tags:'Rótulos & Tags', clients:'Clientes' };
-window.nav = function(v, btn) {
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
-  document.getElementById('view-'+v).classList.add('active');
-  document.getElementById('topbar-title').textContent = TITLES[v];
-  closeSidebar();
-  updateUI();
-};
-window.toggleSidebar = () => { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sbOverlay').classList.toggle('open'); };
-window.closeSidebar  = () => { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sbOverlay').classList.remove('open'); };
-
-// ── DASHBOARD ──
-function renderDashboard() {
-  const c = cc(), id = ci();
-  const posted = c.filter(x=>x.status==='Postado').length;
-  const total  = c.length;
-  const inProd = c.filter(x=>!['Postado','Ideia'].includes(x.status)).length;
-  const rate   = total > 0 ? Math.round(posted/total*100) : 0;
-
-  document.getElementById('dm-p').textContent  = posted;
-  document.getElementById('dm-r').textContent  = rate+'%';
-  document.getElementById('dm-rf').style.width = rate+'%';
-  document.getElementById('dm-rs').textContent = total+' no total';
-  document.getElementById('dm-i').textContent  = inProd;
-  document.getElementById('dm-id').textContent = id.length;
-
-  const barColors = ['rgba(255,255,255,0.1)','rgba(255,255,255,0.18)','rgba(255,255,255,0.28)','rgba(240,78,35,0.6)','rgba(52,211,153,0.7)','#c8f060'];
-  const max = Math.max(...STATUSES.map(s=>c.filter(x=>x.status===s).length), 1);
-  document.getElementById('dash-bars').innerHTML = STATUSES.map((s,i) => {
-    const n = c.filter(x=>x.status===s).length;
-    return `<div class="sb-col"><div class="sb-n">${n}</div><div class="sb-bar" style="height:${Math.round(n/max*76)+4}px;background:${barColors[i]}"></div><div class="sb-lbl">${s}</div></div>`;
-  }).join('');
-
-  const plats = {}; c.forEach(x=>{ plats[x.platform]=(plats[x.platform]||0)+1; });
-  const maxP  = Math.max(...Object.values(plats), 1);
-  document.getElementById('dash-plats').innerHTML = Object.entries(plats).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([p,n])=>`
-    <div class="plat-row">
-      <div class="plat-dot" style="background:${PLAT_COLORS[p]||'#888'}"></div>
-      <span class="plat-name">${p}</span><span class="plat-n">${n}</span>
-      <div class="plat-track"><div class="plat-fill" style="width:${Math.round(n/maxP*100)}%;background:${PLAT_COLORS[p]||'#888'}"></div></div>
-    </div>`).join('') || '<span style="color:var(--text3);font-size:12px;">Nenhum conteúdo ainda</span>';
-
-  document.getElementById('dash-recent-list').innerHTML = c.slice(-4).reverse().map(x=>`
-    <div class="recent-item">
-      <div class="ri-dot" style="background:${STATUS_COLORS[x.status]||'#888'}"></div>
-      <span class="ri-title">${x.title}</span>
-      <span class="ri-badge">${x.status}</span>
-    </div>`).join('') || '<div style="color:var(--text3);font-size:12px;">Nenhum conteúdo ainda</div>';
-
-  document.getElementById('de-big').textContent  = `${posted}/${total}`;
-  document.getElementById('de-pf').style.width   = rate+'%';
-  document.getElementById('de-plan').textContent = total;
-  document.getElementById('de-done').textContent = posted;
-  document.getElementById('de-wip').textContent  = inProd;
-}
-
-// ── CALENDAR ──
-function renderCalendar() {
-  const { y, m } = S.calMonth;
-  document.getElementById('cal-lbl').textContent = `${MONTHS[m]} ${y}`;
-  const chipColors = { Postado:'background:rgba(42,157,92,0.15);color:#1f7d47','Em edição':'background:rgba(240,78,35,0.12);color:#c03a14','Em gravação':'background:rgba(245,158,11,0.12);color:#92630a',Aprovado:'background:rgba(42,157,92,0.15);color:#1f7d47',Ideia:'background:rgba(107,107,200,0.12);color:#4a45a0','Em desenvolvimento':'background:rgba(37,99,235,0.1);color:#1d4ed8' };
-  let html = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'].map(d=>`<div class="cal-hdr">${d}</div>`).join('');
-  const fd = new Date(y,m,1).getDay(), ld = new Date(y,m+1,0).getDate(), today = new Date();
-  for (let i=0;i<fd;i++) { const d=new Date(y,m,1-fd+i); html+=`<div class="cal-day other"><div class="dn">${d.getDate()}</div></div>`; }
-  for (let d=1;d<=ld;d++) {
-    const isToday = today.getFullYear()===y&&today.getMonth()===m&&today.getDate()===d;
-    const ds = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    const dc = cc().filter(c=>c.date===ds);
-    html += `<div class="cal-day${isToday?' today':''}" onclick="openContentModal('${ds}')"><div class="dn">${d}</div>${dc.map(c=>`<div class="cal-chip" style="${chipColors[c.status]||''}" onclick="event.stopPropagation();editContent(${c.id})">${c.title}</div>`).join('')}</div>`;
-  }
-  document.getElementById('cal-grid').innerHTML = html;
-}
-window.chMonth = d => { let {y,m}=S.calMonth; m+=d; if(m>11){m=0;y++;}if(m<0){m=11;y--;} S.calMonth={y,m}; renderCalendar(); };
-window.ctg     = btn => { btn.closest('.cal-toggle').querySelectorAll('.ct-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); };
-
-// ── KANBAN ──
-function renderKanban() {
-  const c = cc();
-  document.getElementById('kanban-board').innerHTML = STATUSES.map(col => {
-    const cards = c.filter(x=>x.status===col);
-    return `<div class="k-col" ondragover="kDO(event,'${col}')" ondrop="kDrop(event,'${col}')" ondragleave="kDL(event)">
+window.chMonth=d=>{let{y,m}=S.calMonth;m+=d;if(m>11){m=0;y++;}if(m<0){m=11;y--;}S.calMonth={y,m};renderCalendar();};
+window.ctg=btn=>{btn.closest('.cal-toggle').querySelectorAll('.ct-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');};
+// KANBAN
+function renderKanban(){
+  const c=cc();
+  document.getElementById('kanban-board').innerHTML=STATUSES.map(col=>{
+    const cards=c.filter(x=>x.status===col);
+    return`<div class="k-col" ondragover="kDO(event,'${col}')" ondrop="kDrop(event,'${col}')" ondragleave="kDL(event)">
       <div class="k-col-head"><span class="k-col-name">${col}</span><span class="k-col-badge">${cards.length}</span></div>
-      <div class="k-col-body">${cards.length ? cards.map(card=>`
+      <div class="k-col-body">${cards.length?cards.map(card=>`
         <div class="k-card" draggable="true" data-id="${card.id}" onclick="editContent(${card.id})" ondragstart="kDS(event,${card.id},'${col}')" ondragend="kDE(event)">
           <div class="kc-plat">${card.platform} · ${card.type}</div>
           <div class="kc-title">${card.title}</div>
-          <div><span class="chip chip-dark">${card.goal}</span></div>
+          <div class="kc-tags">${(card.labels||[]).map(l=>labelChip(l)).join('')}</div>
           ${card.date?`<div class="kc-date">${fmtDate(card.date)}</div>`:''}
-        </div>`).join('') : `<div class="k-empty">Arraste aqui</div>`}</div>
+        </div>`).join(''):`<div class="k-empty">Arraste aqui</div>`}</div>
       <button class="k-add-btn" onclick="openContentModal(null,'${col}')">+ Adicionar</button>
     </div>`;
   }).join('');
 }
-window.kDS = (e,id,col) => { dragId=id; dragFrom=col; setTimeout(()=>{ document.querySelector(`[data-id="${id}"]`)?.classList.add('dragging'); },0); };
-window.kDE = () => { document.querySelectorAll('.k-card').forEach(c=>c.classList.remove('dragging')); document.querySelectorAll('.k-col').forEach(c=>c.classList.remove('drag-over-col')); };
-window.kDO = (e,col) => { e.preventDefault(); e.currentTarget.classList.add('drag-over-col'); };
-window.kDL = e => e.currentTarget.classList.remove('drag-over-col');
-window.kDrop = (e, toCol) => {
-  e.preventDefault(); e.currentTarget.classList.remove('drag-over-col');
-  if (!dragId || dragFrom===toCol) return;
-  const card = S.contents.find(c=>c.id===dragId);
-  if (card) { card.status = toCol; save(); showToast(`→ ${toCol}`); }
-  dragId = null; dragFrom = null;
-};
-
-// ── IDEAS ──
-function renderIdeas(filter='') {
-  const styles = ['ic-white','ic-dark','ic-purple'];
-  const ideas = ci().filter(i=>!filter||i.hook.toLowerCase().includes(filter.toLowerCase()));
-  document.getElementById('ideas-grid').innerHTML = ideas.length ? ideas.map((i,idx)=>`
+window.kDS=(e,id,col)=>{dragId=id;dragFrom=col;setTimeout(()=>document.querySelector(`[data-id="${id}"]`)?.classList.add('dragging'),0);};
+window.kDE=()=>{document.querySelectorAll('.k-card').forEach(c=>c.classList.remove('dragging'));document.querySelectorAll('.k-col').forEach(c=>c.classList.remove('drag-over-col'));};
+window.kDO=(e,col)=>{e.preventDefault();e.currentTarget.classList.add('drag-over-col');};
+window.kDL=e=>e.currentTarget.classList.remove('drag-over-col');
+window.kDrop=(e,toCol)=>{e.preventDefault();e.currentTarget.classList.remove('drag-over-col');if(!dragId||dragFrom===toCol)return;const card=S.contents.find(c=>c.id===dragId);if(card){card.status=toCol;save();showToast(`→ ${toCol}`);}dragId=null;dragFrom=null;};
+// IDEAS
+function renderIdeas(filter=''){
+  const styles=['ic-white','ic-dark','ic-purple'];
+  const ideas=ci().filter(i=>!filter||i.hook.toLowerCase().includes(filter.toLowerCase()));
+  document.getElementById('ideas-grid').innerHTML=ideas.length?ideas.map((i,idx)=>`
     <div class="idea-card ${styles[idx%3]}">
       <div class="idea-hook">${i.hook}</div>
       <div class="idea-meta">
@@ -779,74 +657,67 @@ function renderIdeas(filter='') {
         <div class="ima-row"><span class="ima-lbl">Formato</span><span class="ima-val">${i.format}</span></div>
         <div class="ima-row"><span class="ima-lbl">Funil</span><span class="ima-val">${i.funnel}</span></div>
       </div>
+      <div class="idea-labels">${(i.labels||[]).map(l=>labelChip(l)).join('')}</div>
       <div class="idea-actions">
         <button class="idea-pri" onclick="promoteIdea(${i.id})">Usar no Pipeline →</button>
         <button class="idea-sec" onclick="deleteIdea(${i.id})">Excluir</button>
       </div>
-    </div>`).join('') : '<div style="color:var(--text3);font-size:13px;padding:20px 0;">Nenhuma ideia. Clique em "+ Nova ideia".</div>';
+    </div>`).join(''):'<div style="color:var(--text3);font-size:13px;padding:20px 0">Nenhuma ideia. Clique em "+ Nova ideia".</div>';
 }
-window.promoteIdea = id => {
-  const idea = S.ideas.find(i=>i.id===id); if (!idea) return;
-  S.contents.push({ id:Date.now(), cid:(S.clients[S.activeClient]||{}).id, title:idea.hook.replace(/^"|".*$/g,'').trim(), platform:'Instagram', type:idea.format.split(' ')[0], goal:'Engajamento', status:'Ideia', date:'', theme:'', script:'' });
-  S.ideas = S.ideas.filter(i=>i.id!==id);
-  save(); showToast('Ideia adicionada ao Pipeline!');
-};
-window.deleteIdea = id => { S.ideas=S.ideas.filter(i=>i.id!==id); save(); showToast('Ideia removida'); };
-
-// ── TAGS ──
-function renderTags() {
-  const labels = { nicho:'NICHO', funil:'FUNIL', estrategia:'ESTRATÉGIA', dor:'TIPO DE DOR' };
-  const titles = { nicho:'Segmentos', funil:'Etapas', estrategia:'Abordagens', dor:'Dores' };
-  document.getElementById('tags-bento').innerHTML = Object.entries(S.tags||{}).map(([key,tags])=>`
+window.promoteIdea=id=>{const idea=S.ideas.find(i=>i.id===id);if(!idea)return;S.contents.push({id:Date.now(),cid:(S.clients[S.activeClient]||{}).id,title:idea.hook.replace(/^"|".*$/g,'').trim(),platform:'Instagram',type:idea.format.split(' ')[0],goal:'Engajamento',status:'Ideia',date:'',theme:'',script:'',labels:idea.labels||[]});S.ideas=S.ideas.filter(i=>i.id!==id);save();showToast('Ideia adicionada ao Pipeline!');};
+window.deleteIdea=id=>{S.ideas=S.ideas.filter(i=>i.id!==id);save();showToast('Ideia removida');};
+// TAGS
+function renderTags(){
+  const lbls={nicho:'NICHO',funil:'FUNIL',estrategia:'ESTRATÉGIA',dor:'TIPO DE DOR'};
+  const ttls={nicho:'Segmentos',funil:'Etapas',estrategia:'Abordagens',dor:'Dores'};
+  const desc={nicho:'Categorize por área de atuação',funil:'Etapa do funil de vendas',estrategia:'Tipo de abordagem do conteúdo',dor:'Dor que o conteúdo resolve'};
+  document.getElementById('tags-bento').innerHTML=Object.entries(S.tags||{}).map(([key,tags])=>`
     <div class="tag-panel">
-      <div class="tp-lbl">${labels[key]}</div>
-      <div class="tp-title">${titles[key]}</div>
+      <div class="tp-lbl">${lbls[key]}</div>
+      <div class="tp-title">${ttls[key]}</div>
+      <div class="tp-desc">${desc[key]}</div>
       <div class="tags-flex">
-        ${(tags||[]).map(t=>`<span class="tag-pill" onclick="this.classList.toggle('selected')">${t.l}</span>`).join('')}
+        ${(tags||[]).map(t=>`<span class="tag-pill" style="border-color:${t.c}30">${t.l}<button class="tag-del" onclick="event.stopPropagation();deleteTag('${key}','${t.l}')">&#215;</button></span>`).join('')}
         <button class="tag-add" onclick="addTag('${key}')">+ Adicionar</button>
       </div>
     </div>`).join('');
 }
-window.addTag = cat => {
-  const l = prompt('Nome do rótulo:'); if (!l?.trim()) return;
-  if (!S.tags[cat]) S.tags[cat]=[];
-  S.tags[cat].push({l:l.trim()}); save();
-};
-
-// ── CLIENTS ──
-function renderClients() {
-  document.getElementById('clients-grid').innerHTML = (S.clients||[]).map((c,i)=>{
-    const ct = (S.contents||[]).filter(x=>x.cid===c.id);
-    return `<div class="client-card ${i===S.activeClient?'active-c':''}" onclick="selectClient(${i})">
+window.addTag=cat=>{const l=prompt('Nome do rótulo:');if(!l?.trim())return;const cols=['#7c3aed','#059669','#d97706','#dc2626','#2563eb','#db2777'];S.tags[cat].push({l:l.trim(),c:cols[S.tags[cat].length%cols.length]});save();};
+window.deleteTag=(cat,l)=>{if(!confirm(`Excluir rótulo "${l}"?`))return;S.tags[cat]=(S.tags[cat]||[]).filter(t=>t.l!==l);S.contents.forEach(c=>{c.labels=(c.labels||[]).filter(x=>x!==l);});S.ideas.forEach(i=>{i.labels=(i.labels||[]).filter(x=>x!==l);});save();};
+// CLIENTS
+function renderClients(){
+  document.getElementById('clients-grid').innerHTML=(S.clients||[]).map((c,i)=>{
+    const ct=(S.contents||[]).filter(x=>x.cid===c.id);
+    return`<div class="client-card ${i===S.activeClient?'active-c':''}" onclick="selectClient(${i})">
+      <button class="cc-del" onclick="event.stopPropagation();deleteClient(${i})">&#215;</button>
       <div class="cc-av" style="background:${c.bg};color:${c.fg}">${c.initials}</div>
       <div class="cc-name">${c.name}</div><div class="cc-niche">${c.niche}</div>
-      <div class="cc-stats">
-        <div><div class="cc-sv">${ct.length}</div><div class="cc-sl">conteúdos</div></div>
-        <div><div class="cc-sv">${ct.filter(x=>x.status==='Postado').length}</div><div class="cc-sl">postados</div></div>
-      </div>
-      ${i===S.activeClient?'<div class="cc-active">✓ ativo agora</div>':''}
+      <div class="cc-stats"><div><div class="cc-sv">${ct.length}</div><div class="cc-sl">conteúdos</div></div><div><div class="cc-sv">${ct.filter(x=>x.status==='Postado').length}</div><div class="cc-sl">postados</div></div></div>
+      ${i===S.activeClient?'<div class="cc-active">&#10003; ativo agora</div>':''}
     </div>`;
   }).join('');
 }
-window.selectClient = i => { S.activeClient=i; save(); showToast(`Projeto: ${(S.clients[i]||{}).name}`); };
-
-// ── MODALS ──
-window.openClientPicker = () => {
-  document.getElementById('modal-title').textContent='Trocar de projeto';
-  document.getElementById('modal-body').innerHTML=`<div style="display:flex;flex-direction:column;gap:8px;">
-    ${(S.clients||[]).map((c,i)=>`<div style="display:flex;align-items:center;gap:12px;padding:14px;background:${i===S.activeClient?'rgba(240,78,35,0.06)':'var(--bg)'};border:1.5px solid ${i===S.activeClient?'var(--orange)':'transparent'};border-radius:var(--r-sm);cursor:pointer;" onclick="selectClient(${i});closeModal()">
-      <div style="width:36px;height:36px;border-radius:9px;background:${c.bg};color:${c.fg};display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:13px;font-weight:700;">${c.initials}</div>
-      <div><div style="font-size:14px;font-weight:600;font-family:var(--font-display);color:var(--text)">${c.name}</div><div style="font-size:11px;color:var(--text3)">${c.niche}</div></div>
-    </div>`).join('')}
-  </div>`;
-  document.getElementById('modal-foot').style.display='none';
-  currentModal='picker';
-  document.getElementById('modalOverlay').classList.add('open');
+window.selectClient=i=>{S.activeClient=i;save();showToast(`Projeto: ${(S.clients[i]||{}).name}`);};
+window.deleteClient=i=>{
+  if((S.clients||[]).length<=1){showToast('É preciso ter pelo menos 1 cliente');return;}
+  if(!confirm(`Excluir "${S.clients[i].name}"? Todos os dados deste cliente serão apagados.`))return;
+  const cid=S.clients[i].id;S.clients.splice(i,1);S.contents=S.contents.filter(c=>c.cid!==cid);S.ideas=S.ideas.filter(x=>x.cid!==cid);if(S.activeClient>=S.clients.length)S.activeClient=S.clients.length-1;save();showToast('Cliente excluído');
 };
-
-window.openContentModal = (date=null, status='Ideia') => {
-  document.getElementById('modal-foot').style.display='';
-  document.getElementById('modal-title').textContent='Novo Conteúdo';
+// TAG SELECTOR
+function buildTagSel(selected=[]){
+  const all=allTags();if(!all.length)return'<div style="color:var(--text3);font-size:12px">Nenhum rótulo. Acesse a seção Rótulos para criar.</div>';
+  return`<div class="tag-selector" id="tagSel">${all.map(t=>`<button class="ts-pill${selected.includes(t.l)?' sel':''}" style="${selected.includes(t.l)?`background:${t.c};border-color:${t.c};color:#fff`:''}" onclick="toggleLbl('${t.l}',this,'${t.c}')">${t.l}</button>`).join('')}</div>`;
+}
+window.toggleLbl=(l,btn,c)=>{btn.classList.toggle('sel');if(btn.classList.contains('sel')){btn.style.background=c;btn.style.borderColor=c;btn.style.color='#fff';}else{btn.style.background='';btn.style.borderColor='';btn.style.color='';}};
+function getSelLabels(){return[...document.querySelectorAll('#tagSel .ts-pill.sel')].map(b=>b.textContent);}
+// MODALS
+window.openClientPicker=()=>{
+  document.getElementById('modal-title').textContent='Trocar de projeto';
+  document.getElementById('modal-body').innerHTML=`<div style="display:flex;flex-direction:column;gap:8px">${(S.clients||[]).map((c,i)=>`<div style="display:flex;align-items:center;gap:12px;padding:14px;background:${i===S.activeClient?'rgba(240,78,35,.06)':'var(--bg)'};border:1.5px solid ${i===S.activeClient?'var(--orange)':'transparent'};border-radius:var(--r-sm);cursor:pointer" onclick="selectClient(${i});closeModal()"><div style="width:36px;height:36px;border-radius:9px;background:${c.bg};color:${c.fg};display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:13px;font-weight:700">${c.initials}</div><div><div style="font-size:14px;font-weight:600;font-family:var(--font-display);color:var(--text)">${c.name}</div><div style="font-size:11px;color:var(--text3)">${c.niche}</div></div></div>`).join('')}</div>`;
+  document.getElementById('modal-foot').style.display='none';currentModal='picker';document.getElementById('modalOverlay').classList.add('open');
+};
+window.openContentModal=(date=null,status='Ideia')=>{
+  document.getElementById('modal-foot').style.display='';document.getElementById('modal-title').textContent='Novo Conteúdo';
   document.getElementById('modal-body').innerHTML=`
     <div class="form-group"><label class="form-label">TÍTULO</label><input class="form-input" id="f-title" placeholder="Ex: 5 erros antes de contratar advogado"/></div>
     <div class="form-row">
@@ -861,15 +732,13 @@ window.openContentModal = (date=null, status='Ideia') => {
       <div class="form-group"><label class="form-label">TEMA</label><input class="form-input" id="f-theme" placeholder="Ex: Direito trabalhista"/></div>
       <div class="form-group"><label class="form-label">DATA</label><input class="form-input" id="f-date" type="date" value="${date||''}"/></div>
     </div>
+    <div class="form-group"><label class="form-label">RÓTULOS</label>${buildTagSel([])}</div>
     <div class="form-group"><label class="form-label">ROTEIRO / LEGENDA</label><textarea class="form-textarea" id="f-script" placeholder="Escreva aqui..."></textarea></div>`;
-  currentModal='content';
-  document.getElementById('modalOverlay').classList.add('open');
+  currentModal='content';document.getElementById('modalOverlay').classList.add('open');
 };
-
-window.editContent = id => {
-  const c = S.contents.find(x=>x.id===id); if (!c) return;
-  document.getElementById('modal-foot').style.display='';
-  document.getElementById('modal-title').textContent='Editar Conteúdo';
+window.editContent=id=>{
+  const c=S.contents.find(x=>x.id===id);if(!c)return;
+  document.getElementById('modal-foot').style.display='';document.getElementById('modal-title').textContent='Editar Conteúdo';
   document.getElementById('modal-body').innerHTML=`
     <div class="form-group"><label class="form-label">TÍTULO</label><input class="form-input" id="f-title" value="${esc(c.title)}"/></div>
     <div class="form-row">
@@ -884,106 +753,65 @@ window.editContent = id => {
       <div class="form-group"><label class="form-label">TEMA</label><input class="form-input" id="f-theme" value="${esc(c.theme||'')}"/></div>
       <div class="form-group"><label class="form-label">DATA</label><input class="form-input" id="f-date" type="date" value="${c.date||''}"/></div>
     </div>
+    <div class="form-group"><label class="form-label">RÓTULOS</label>${buildTagSel(c.labels||[])}</div>
     <div class="form-group"><label class="form-label">ROTEIRO / LEGENDA</label><textarea class="form-textarea" id="f-script">${esc(c.script||'')}</textarea></div>
-    <div><button class="btn" style="color:var(--orange);border-color:rgba(240,78,35,0.2);" onclick="deleteContent(${id})">Excluir conteúdo</button></div>`;
-  currentModal='edit-'+id;
-  document.getElementById('modalOverlay').classList.add('open');
+    <div><button class="btn btn-danger" onclick="deleteContent(${id})">Excluir conteúdo</button></div>`;
+  currentModal='edit-'+id;document.getElementById('modalOverlay').classList.add('open');
 };
-window.deleteContent = id => { S.contents=S.contents.filter(c=>c.id!==id); save(); closeModal(); showToast('Excluído'); };
-
-window.openIdeaModal = () => {
-  document.getElementById('modal-foot').style.display='';
-  document.getElementById('modal-title').textContent='Nova Ideia';
+window.deleteContent=id=>{S.contents=S.contents.filter(c=>c.id!==id);save();closeModal();showToast('Excluído');};
+window.openIdeaModal=()=>{
+  document.getElementById('modal-foot').style.display='';document.getElementById('modal-title').textContent='Nova Ideia';
   document.getElementById('modal-body').innerHTML=`
     <div class="form-group"><label class="form-label">GANCHO</label><input class="form-input" id="f-hook" placeholder='"Você pode estar perdendo dinheiro sem saber"'/></div>
     <div class="form-group"><label class="form-label">REFERÊNCIA</label><input class="form-input" id="f-ref" placeholder="Trend, dor real, pergunta de seguidor..."/></div>
     <div class="form-row">
       <div class="form-group"><label class="form-label">FORMATO</label><select class="form-select" id="f-format">${['Reels narrativo','Carrossel educativo','Story sequência','Reels lista','Feed estático','Artigo LinkedIn'].map(f=>`<option>${f}</option>`).join('')}</select></div>
       <div class="form-group"><label class="form-label">FUNIL</label><select class="form-select" id="f-funnel"><option>Topo</option><option>Meio</option><option>Fundo</option></select></div>
-    </div>`;
-  currentModal='idea';
-  document.getElementById('modalOverlay').classList.add('open');
+    </div>
+    <div class="form-group"><label class="form-label">RÓTULOS</label>${buildTagSel([])}</div>`;
+  currentModal='idea';document.getElementById('modalOverlay').classList.add('open');
 };
-
-window.openClientModal = () => {
-  document.getElementById('modal-foot').style.display='';
-  document.getElementById('modal-title').textContent='Novo Cliente';
+window.openClientModal=()=>{
+  document.getElementById('modal-foot').style.display='';document.getElementById('modal-title').textContent='Novo Cliente';
   document.getElementById('modal-body').innerHTML=`
     <div class="form-group"><label class="form-label">NOME</label><input class="form-input" id="f-cname" placeholder="Ex: Ana Lima — Nutricionista"/></div>
     <div class="form-group"><label class="form-label">NICHO</label><input class="form-input" id="f-cniche" placeholder="Ex: Saúde, Moda, Jurídico..."/></div>
     <div class="form-group"><label class="form-label">INICIAIS</label><input class="form-input" id="f-ci" placeholder="AL" maxlength="2" style="text-transform:uppercase"/></div>`;
-  currentModal='client';
-  document.getElementById('modalOverlay').classList.add('open');
+  currentModal='client';document.getElementById('modalOverlay').classList.add('open');
 };
-
-window.saveModal = () => {
-  const cid = (S.clients[S.activeClient]||{}).id;
-  if (currentModal==='content') {
-    const title = document.getElementById('f-title').value.trim();
-    if (!title) { showToast('Digite um título'); return; }
-    S.contents.push({ id:Date.now(), cid, title, platform:document.getElementById('f-platform').value, type:document.getElementById('f-type').value, goal:document.getElementById('f-goal').value, status:document.getElementById('f-status').value, date:document.getElementById('f-date').value, theme:document.getElementById('f-theme').value, script:document.getElementById('f-script').value });
-    save(); closeModal(); showToast('Conteúdo criado!');
-  } else if (currentModal?.startsWith('edit-')) {
-    const id = parseInt(currentModal.split('-')[1]);
-    const c  = S.contents.find(x=>x.id===id);
-    if (c) { c.title=document.getElementById('f-title').value; c.platform=document.getElementById('f-platform').value; c.type=document.getElementById('f-type').value; c.goal=document.getElementById('f-goal').value; c.status=document.getElementById('f-status').value; c.date=document.getElementById('f-date').value; c.theme=document.getElementById('f-theme').value; c.script=document.getElementById('f-script').value; save(); closeModal(); showToast('Salvo!'); }
-  } else if (currentModal==='idea') {
-    const hook = document.getElementById('f-hook').value.trim();
-    if (!hook) { showToast('Digite o gancho'); return; }
-    S.ideas.push({ id:Date.now(), cid, hook, ref:document.getElementById('f-ref').value, format:document.getElementById('f-format').value, funnel:document.getElementById('f-funnel').value });
-    save(); closeModal(); showToast('Ideia salva!');
-  } else if (currentModal==='client') {
-    const name = document.getElementById('f-cname').value.trim();
-    if (!name) { showToast('Digite o nome'); return; }
-    const bgs=['rgba(167,139,250,0.2)','rgba(251,191,36,0.2)','rgba(52,211,153,0.2)','rgba(240,78,35,0.15)','rgba(96,165,250,0.2)'];
-    const fgs=['#5b4fcf','#92630a','#0d6e45','#b83010','#1d4ed8'];
-    const idx=(S.clients||[]).length%5;
-    if (!S.clients) S.clients=[];
-    S.clients.push({ id:Date.now(), name, niche:document.getElementById('f-cniche').value, bg:bgs[idx], fg:fgs[idx], initials:(document.getElementById('f-ci').value.trim().toUpperCase()||name.slice(0,2).toUpperCase()) });
-    save(); closeModal(); showToast('Cliente adicionado!');
+window.saveModal=()=>{
+  const cid=(S.clients[S.activeClient]||{}).id;
+  if(currentModal==='content'){
+    const title=document.getElementById('f-title').value.trim();if(!title){showToast('Digite um título');return;}
+    S.contents.push({id:Date.now(),cid,title,platform:document.getElementById('f-platform').value,type:document.getElementById('f-type').value,goal:document.getElementById('f-goal').value,status:document.getElementById('f-status').value,date:document.getElementById('f-date').value,theme:document.getElementById('f-theme').value,script:document.getElementById('f-script').value,labels:getSelLabels()});
+    save();closeModal();showToast('Conteúdo criado!');
+  }else if(currentModal?.startsWith('edit-')){
+    const id=parseInt(currentModal.split('-')[1]);const c=S.contents.find(x=>x.id===id);
+    if(c){c.title=document.getElementById('f-title').value;c.platform=document.getElementById('f-platform').value;c.type=document.getElementById('f-type').value;c.goal=document.getElementById('f-goal').value;c.status=document.getElementById('f-status').value;c.date=document.getElementById('f-date').value;c.theme=document.getElementById('f-theme').value;c.script=document.getElementById('f-script').value;c.labels=getSelLabels();save();closeModal();showToast('Salvo!');}
+  }else if(currentModal==='idea'){
+    const hook=document.getElementById('f-hook').value.trim();if(!hook){showToast('Digite o gancho');return;}
+    S.ideas.push({id:Date.now(),cid,hook,ref:document.getElementById('f-ref').value,format:document.getElementById('f-format').value,funnel:document.getElementById('f-funnel').value,labels:getSelLabels()});
+    save();closeModal();showToast('Ideia salva!');
+  }else if(currentModal==='client'){
+    const name=document.getElementById('f-cname').value.trim();if(!name){showToast('Digite o nome');return;}
+    const bgs=['rgba(167,139,250,.2)','rgba(251,191,36,.2)','rgba(52,211,153,.2)','rgba(240,78,35,.15)','rgba(96,165,250,.2)'];
+    const fgs=['#5b4fcf','#92630a','#0d6e45','#b83010','#1d4ed8'];const idx=(S.clients||[]).length%5;
+    S.clients.push({id:Date.now(),name,niche:document.getElementById('f-cniche').value,bg:bgs[idx],fg:fgs[idx],initials:(document.getElementById('f-ci').value.trim().toUpperCase()||name.slice(0,2).toUpperCase())});
+    save();closeModal();showToast('Cliente adicionado!');
   }
 };
-
-window.closeModal = () => {
-  document.getElementById('modalOverlay').classList.remove('open');
-  document.getElementById('modal-foot').style.display='';
-  currentModal=null;
-};
-
-// ── SERVICE WORKER ──
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').catch(()=>{});
-}
-
-// ── MOBILE ──
-const hb = document.querySelector('.hamburger');
-const setHB = () => hb.style.display = window.innerWidth<=768?'flex':'none';
-setHB(); window.addEventListener('resize', setHB);
-
-// ── BOOT ──
-async function boot() {
-  setLoadingMsg('Carregando dados locais...');
+window.closeModal=()=>{document.getElementById('modalOverlay').classList.remove('open');document.getElementById('modal-foot').style.display='';currentModal=null;};
+// SW
+if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+// MOBILE
+const hb=document.querySelector('.hamburger');const setHB=()=>hb.style.display=window.innerWidth<=768?'flex':'none';setHB();window.addEventListener('resize',setHB);
+// BOOT
+async function boot(){
   await openIDB();
-  // carrega dados locais primeiro (funciona offline)
-  const local = await idbGet('state');
-  if (local) {
-    S = { ...DEFAULT, ...local,
-      clients:  Array.isArray(local.clients)  ? local.clients  : DEFAULT.clients,
-      contents: Array.isArray(local.contents) ? local.contents : DEFAULT.contents,
-      ideas:    Array.isArray(local.ideas)    ? local.ideas    : DEFAULT.ideas,
-    };
-    updateUI();
-    hideLoading();
-    setLoadingMsg('Sincronizando...');
-  }
-  // conecta ao Firebase se online
-  updateNetworkStatus();
-  if (isOnline) {
-    startFirebaseSync();
-  } else {
-    setSyncStatus('offline');
-    if (!local) { S = JSON.parse(JSON.stringify(DEFAULT)); await idbSet('state', S); updateUI(); hideLoading(); }
-  }
+  const local=await idbGet('state');
+  if(local){S={...DEF,...local,clients:Array.isArray(local.clients)?local.clients:DEF.clients,contents:Array.isArray(local.contents)?local.contents:DEF.contents,ideas:Array.isArray(local.ideas)?local.ideas:DEF.ideas};applyDark();updateUI();hideLoading();}
+  updateNet();
+  if(isOnline)startFB();else{setSS('offline');if(!local){S=JSON.parse(JSON.stringify(DEF));await idbSet('state',S);updateUI();hideLoading();}}
 }
 boot();
 </script>
