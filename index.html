@@ -186,12 +186,42 @@ body.dark .dm-purple .dm-label{color:rgba(168,156,247,.5)}
 .cal-grid-wrap{padding:14px 18px 18px}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
 .cal-hdr{padding:7px 5px;font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em}
-.cal-day{min-height:84px;padding:7px 5px;cursor:pointer;border-radius:var(--r-xs);transition:background .1s}
+.cal-day{min-height:100px;padding:7px 5px;cursor:pointer;border-radius:var(--r-xs);transition:background .1s}
 .cal-day:hover{background:var(--bg)}
 .cal-day.other{opacity:.3}
 .cal-day.today .dn{background:var(--dark);color:var(--surface);border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;margin-left:-1px}
 .dn{font-size:12px;color:var(--text3);font-family:var(--mono);margin-bottom:4px}
-.cal-chip{padding:2px 6px;border-radius:5px;font-size:10px;font-weight:600;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.cal-chip{padding:3px 6px;border-radius:6px;font-size:10px;font-weight:600;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;display:flex;align-items:center;gap:4px}
+.cal-chip-time{font-size:9px;font-family:var(--mono);background:rgba(0,0,0,.12);padding:1px 5px;border-radius:4px;flex-shrink:0;font-weight:700}
+.cal-chip.approved{background:rgba(42,157,92,.15);color:#1f7d47}
+.cal-chip.posted{background:rgba(37,99,235,.1);color:#1d4ed8}
+/* cal filter bar */
+.cal-filter-bar{display:flex;gap:6px;padding:12px 22px 0;flex-wrap:wrap}
+.cal-filter-btn{padding:5px 13px;border-radius:50px;font-size:11px;font-weight:500;cursor:pointer;border:1.5px solid var(--border2);background:none;color:var(--text2);font-family:var(--font);transition:all .14s}
+.cal-filter-btn:hover{border-color:var(--orange);color:var(--orange)}
+.cal-filter-btn.active{background:var(--dark);color:var(--surface);border-color:var(--dark)}
+body.dark .cal-filter-btn.active{background:#f0ede8;color:#111;border-color:#f0ede8}
+/* cal day detail panel */
+.cal-detail{display:none;position:fixed;inset:0;z-index:150;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.4);backdrop-filter:blur(3px)}
+.cal-detail.open{display:flex}
+.cal-detail-panel{background:var(--surface);border-radius:var(--r) var(--r) 0 0;width:100%;max-width:560px;max-height:80dvh;overflow-y:auto;padding:0 0 calc(20px + var(--safe-bot));animation:slideUp .22s cubic-bezier(.4,0,.2,1)}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.cdp-head{padding:20px 22px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:1}
+.cdp-date{font-family:var(--font-display);font-size:17px;font-weight:800}
+.cdp-close{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--border);background:none;cursor:pointer;color:var(--text3);font-size:18px;display:flex;align-items:center;justify-content:center}
+.cdp-body{padding:16px 22px;display:flex;flex-direction:column;gap:10px}
+.cdp-card{background:var(--bg);border-radius:var(--r-sm);padding:14px;display:flex;align-items:flex-start;gap:12px;cursor:pointer;border:1.5px solid transparent;transition:all .14s}
+.cdp-card:hover{border-color:var(--border2);background:var(--surface2)}
+.cdp-time-badge{background:var(--dark);color:var(--surface);font-family:var(--mono);font-size:12px;font-weight:700;padding:6px 10px;border-radius:var(--r-xs);flex-shrink:0;min-width:52px;text-align:center}
+.cdp-card.approved .cdp-time-badge{background:#1f7d47;color:#fff}
+.cdp-card.posted .cdp-time-badge{background:#1d4ed8;color:#fff}
+.cdp-info{flex:1;min-width:0}
+.cdp-title{font-family:var(--font-display);font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cdp-meta{font-size:11px;color:var(--text3);font-family:var(--mono)}
+.cdp-status{font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;flex-shrink:0}
+.cdp-empty{color:var(--text3);font-size:13px;text-align:center;padding:24px 0}
+.cdp-add{width:100%;padding:11px;border:1.5px dashed var(--border2);background:none;border-radius:var(--r-sm);color:var(--text3);font-size:13px;cursor:pointer;font-family:var(--font);transition:all .14s;margin-top:4px}
+.cdp-add:hover{border-color:var(--orange);color:var(--orange)}
 /* KANBAN */
 .kanban-wrap{display:flex;gap:10px;overflow-x:auto;padding-bottom:10px}
 .k-col{min-width:215px;width:215px;display:flex;flex-direction:column;flex-shrink:0;max-height:calc(100dvh - 100px)}
@@ -456,7 +486,22 @@ body.dark .dm-purple .dm-label{color:rgba(168,156,247,.5)}
             <div class="cal-sep"></div>
             <div class="cal-toggle"><button class="ct-btn active" onclick="ctg(this)">Mensal</button><button class="ct-btn" onclick="ctg(this)">Semanal</button></div>
           </div>
+          <div class="cal-filter-bar">
+            <button class="cal-filter-btn active" onclick="setCalFilter('all',this)">Todos</button>
+            <button class="cal-filter-btn" onclick="setCalFilter('Aprovado',this)">&#10003; Aprovados</button>
+            <button class="cal-filter-btn" onclick="setCalFilter('Postado',this)">&#128190; Postados</button>
+          </div>
           <div class="cal-grid-wrap"><div class="cal-grid" id="cal-grid"></div></div>
+        </div>
+      </div>
+      <!-- CALENDAR DAY DETAIL -->
+      <div class="cal-detail" id="calDetail" onclick="if(event.target===this)closeCalDetail()">
+        <div class="cal-detail-panel">
+          <div class="cdp-head">
+            <div class="cdp-date" id="cdpDate">—</div>
+            <button class="cdp-close" onclick="closeCalDetail()">&#215;</button>
+          </div>
+          <div class="cdp-body" id="cdpBody"></div>
         </div>
       </div>
       <div id="view-kanban" class="view"><div class="kanban-wrap" id="kanban-board"></div></div>
@@ -606,22 +651,61 @@ function renderLineChart(){
   document.getElementById('lcLegend').innerHTML=series.map(s=>`<div class="lc-leg-item"><div class="lc-leg-dot" style="background:${s.color}"></div><span style="color:${dark?'rgba(0,0,0,.4)':'rgba(255,255,255,.4)'}">${s.label}</span></div>`).join('');
 }
 // CALENDAR
+let calFilter='all';
+window.setCalFilter=(f,btn)=>{calFilter=f;document.querySelectorAll('.cal-filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderCalendar();};
+function statusClass(s){return s==='Aprovado'?'approved':s==='Postado'?'posted':'';}
+function statusChipStyle(s){
+  const map={Postado:'background:rgba(37,99,235,.1);color:#1d4ed8','Em edição':'background:rgba(240,78,35,.12);color:#c03a14','Em gravação':'background:rgba(245,158,11,.12);color:#92630a',Aprovado:'background:rgba(42,157,92,.15);color:#1f7d47',Ideia:'background:rgba(107,107,200,.12);color:#4a45a0','Em desenvolvimento':'background:rgba(37,99,235,.1);color:#1d4ed8'};
+  return map[s]||'';
+}
 function renderCalendar(){
   const{y,m}=S.calMonth;document.getElementById('cal-lbl').textContent=`${MONTHS[m]} ${y}`;
-  const chipC={Postado:'background:rgba(42,157,92,.15);color:#1f7d47','Em edição':'background:rgba(240,78,35,.12);color:#c03a14','Em gravação':'background:rgba(245,158,11,.12);color:#92630a',Aprovado:'background:rgba(42,157,92,.15);color:#1f7d47',Ideia:'background:rgba(107,107,200,.12);color:#4a45a0','Em desenvolvimento':'background:rgba(37,99,235,.1);color:#1d4ed8'};
   let html=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'].map(d=>`<div class="cal-hdr">${d}</div>`).join('');
   const fd=new Date(y,m,1).getDay(),ld=new Date(y,m+1,0).getDate(),today=new Date();
   for(let i=0;i<fd;i++){const d=new Date(y,m,1-fd+i);html+=`<div class="cal-day other"><div class="dn">${d.getDate()}</div></div>`;}
   for(let d=1;d<=ld;d++){
     const isT=today.getFullYear()===y&&today.getMonth()===m&&today.getDate()===d;
     const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    const dc=cc().filter(c=>c.date===ds);
-    html+=`<div class="cal-day${isT?' today':''}" onclick="openContentModal('${ds}')"><div class="dn">${d}</div>${dc.map(c=>`<div class="cal-chip" style="${chipC[c.status]||''}" onclick="event.stopPropagation();editContent(${c.id})">${c.title}</div>`).join('')}</div>`;
+    let dc=cc().filter(c=>c.date===ds);
+    if(calFilter!=='all') dc=dc.filter(c=>c.status===calFilter);
+    // sort by time
+    dc.sort((a,b)=>(a.postTime||'23:59').localeCompare(b.postTime||'23:59'));
+    const chips=dc.map(c=>{
+      const timeTag=c.postTime?`<span class="cal-chip-time">${c.postTime}</span>`:'';
+      return`<div class="cal-chip ${statusClass(c.status)}" style="${statusChipStyle(c.status)}" onclick="event.stopPropagation();openCalDay('${ds}')">${timeTag}${c.title}</div>`;
+    }).join('');
+    const hasItems=dc.length>0;
+    html+=`<div class="cal-day${isT?' today':''}${hasItems?' has-items':''}" onclick="openCalDay('${ds}')"><div class="dn">${d}</div>${chips}</div>`;
   }
   document.getElementById('cal-grid').innerHTML=html;
 }
 window.chMonth=d=>{let{y,m}=S.calMonth;m+=d;if(m>11){m=0;y++;}if(m<0){m=11;y--;}S.calMonth={y,m};renderCalendar();};
 window.ctg=btn=>{btn.closest('.cal-toggle').querySelectorAll('.ct-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');};
+// CALENDAR DAY DETAIL
+window.openCalDay=ds=>{
+  const[y,m,d]=ds.split('-');
+  const dateLabel=`${parseInt(d)} de ${MONTHS[parseInt(m)-1]} ${y}`;
+  document.getElementById('cdpDate').textContent=dateLabel;
+  let items=cc().filter(c=>c.date===ds);
+  if(calFilter!=='all') items=items.filter(c=>c.status===calFilter);
+  items.sort((a,b)=>(a.postTime||'23:59').localeCompare(b.postTime||'23:59'));
+  const statusColors={Postado:'#1d4ed8',Aprovado:'#1f7d47','Em edição':'#c03a14','Em gravação':'#92630a',Ideia:'#4a45a0','Em desenvolvimento':'#1d4ed8'};
+  const statusBgs={Postado:'rgba(37,99,235,.1)',Aprovado:'rgba(42,157,92,.15)','Em edição':'rgba(240,78,35,.12)','Em gravação':'rgba(245,158,11,.12)',Ideia:'rgba(107,107,200,.12)','Em desenvolvimento':'rgba(37,99,235,.1)'};
+  document.getElementById('cdpBody').innerHTML=items.length
+    ?items.map(c=>`
+      <div class="cdp-card ${statusClass(c.status)}" onclick="editContent(${c.id});closeCalDetail()">
+        <div class="cdp-time-badge">${c.postTime||'--:--'}</div>
+        <div class="cdp-info">
+          <div class="cdp-title">${c.title}</div>
+          <div class="cdp-meta">${c.platform} · ${c.type} · ${c.goal}</div>
+          ${(c.labels||[]).length?`<div style="margin-top:5px;display:flex;gap:4px;flex-wrap:wrap">${c.labels.map(l=>labelChip(l)).join('')}</div>`:''}
+        </div>
+        <span class="cdp-status" style="background:${statusBgs[c.status]||''};color:${statusColors[c.status]||'#888'}">${c.status}</span>
+      </div>`).join('')+`<button class="cdp-add" onclick="openContentModal('${ds}');closeCalDetail()">+ Adicionar conteúdo neste dia</button>`
+    :`<div class="cdp-empty">Nenhum conteúdo neste dia</div><button class="cdp-add" onclick="openContentModal('${ds}');closeCalDetail()">+ Adicionar conteúdo</button>`;
+  document.getElementById('calDetail').classList.add('open');
+};
+window.closeCalDetail=()=>document.getElementById('calDetail').classList.remove('open');
 // KANBAN
 function renderKanban(){
   const c=cc();
@@ -732,6 +816,10 @@ window.openContentModal=(date=null,status='Ideia')=>{
       <div class="form-group"><label class="form-label">TEMA</label><input class="form-input" id="f-theme" placeholder="Ex: Direito trabalhista"/></div>
       <div class="form-group"><label class="form-label">DATA</label><input class="form-input" id="f-date" type="date" value="${date||''}"/></div>
     </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">HORÁRIO DE POSTAGEM</label><input class="form-input" id="f-time" type="time" placeholder="Ex: 18:00"/></div>
+      <div class="form-group" style="justify-content:flex-end;padding-top:20px"><span style="font-size:11px;color:var(--text3);font-family:var(--mono)">Aparece como etiqueta no calendário</span></div>
+    </div>
     <div class="form-group"><label class="form-label">RÓTULOS</label>${buildTagSel([])}</div>
     <div class="form-group"><label class="form-label">ROTEIRO / LEGENDA</label><textarea class="form-textarea" id="f-script" placeholder="Escreva aqui..."></textarea></div>`;
   currentModal='content';document.getElementById('modalOverlay').classList.add('open');
@@ -752,6 +840,10 @@ window.editContent=id=>{
     <div class="form-row">
       <div class="form-group"><label class="form-label">TEMA</label><input class="form-input" id="f-theme" value="${esc(c.theme||'')}"/></div>
       <div class="form-group"><label class="form-label">DATA</label><input class="form-input" id="f-date" type="date" value="${c.date||''}"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">HORÁRIO DE POSTAGEM</label><input class="form-input" id="f-time" type="time" value="${c.postTime||''}"/></div>
+      <div class="form-group" style="justify-content:flex-end;padding-top:20px"><span style="font-size:11px;color:var(--text3);font-family:var(--mono)">Etiqueta no calendário</span></div>
     </div>
     <div class="form-group"><label class="form-label">RÓTULOS</label>${buildTagSel(c.labels||[])}</div>
     <div class="form-group"><label class="form-label">ROTEIRO / LEGENDA</label><textarea class="form-textarea" id="f-script">${esc(c.script||'')}</textarea></div>
@@ -783,11 +875,11 @@ window.saveModal=()=>{
   const cid=(S.clients[S.activeClient]||{}).id;
   if(currentModal==='content'){
     const title=document.getElementById('f-title').value.trim();if(!title){showToast('Digite um título');return;}
-    S.contents.push({id:Date.now(),cid,title,platform:document.getElementById('f-platform').value,type:document.getElementById('f-type').value,goal:document.getElementById('f-goal').value,status:document.getElementById('f-status').value,date:document.getElementById('f-date').value,theme:document.getElementById('f-theme').value,script:document.getElementById('f-script').value,labels:getSelLabels()});
+    S.contents.push({id:Date.now(),cid,title,platform:document.getElementById('f-platform').value,type:document.getElementById('f-type').value,goal:document.getElementById('f-goal').value,status:document.getElementById('f-status').value,date:document.getElementById('f-date').value,postTime:document.getElementById('f-time').value,theme:document.getElementById('f-theme').value,script:document.getElementById('f-script').value,labels:getSelLabels()});
     save();closeModal();showToast('Conteúdo criado!');
   }else if(currentModal?.startsWith('edit-')){
     const id=parseInt(currentModal.split('-')[1]);const c=S.contents.find(x=>x.id===id);
-    if(c){c.title=document.getElementById('f-title').value;c.platform=document.getElementById('f-platform').value;c.type=document.getElementById('f-type').value;c.goal=document.getElementById('f-goal').value;c.status=document.getElementById('f-status').value;c.date=document.getElementById('f-date').value;c.theme=document.getElementById('f-theme').value;c.script=document.getElementById('f-script').value;c.labels=getSelLabels();save();closeModal();showToast('Salvo!');}
+    if(c){c.title=document.getElementById('f-title').value;c.platform=document.getElementById('f-platform').value;c.type=document.getElementById('f-type').value;c.goal=document.getElementById('f-goal').value;c.status=document.getElementById('f-status').value;c.date=document.getElementById('f-date').value;c.postTime=document.getElementById('f-time').value;c.theme=document.getElementById('f-theme').value;c.script=document.getElementById('f-script').value;c.labels=getSelLabels();save();closeModal();showToast('Salvo!');}
   }else if(currentModal==='idea'){
     const hook=document.getElementById('f-hook').value.trim();if(!hook){showToast('Digite o gancho');return;}
     S.ideas.push({id:Date.now(),cid,hook,ref:document.getElementById('f-ref').value,format:document.getElementById('f-format').value,funnel:document.getElementById('f-funnel').value,labels:getSelLabels()});
